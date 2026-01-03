@@ -22,7 +22,7 @@
     <script>
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
-        const segments = ["ZONK", "HADIAH 1", "ZONK", "HADIAH 2", "ZONK", "JACKPOT"];
+        const segments = ["ZONK", "SALDO 50K", "ZONK", "SALDO 100K", "ZONK", "SALDO 500K"];
         const colors = ["#e74c3c", "#3498db", "#e74c3c", "#9b59b6", "#e74c3c", "#f1c40f"];
         
         let startAngle = 0;
@@ -32,7 +32,7 @@
         // --- BAGIAN SETTINGAN ---
         // Ganti angka ini untuk menentukan hasil: 
         // 0=Zonk, 1=Hadiah 1, 2=Zonk, 3=Hadiah 2, 4=Zonk, 5=JACKPOT
-        const HASIL_SETTINGAN = 5; 
+        const HASIL_SETTINGAN = 0; 
         // ------------------------
 
         function drawWheel() {
