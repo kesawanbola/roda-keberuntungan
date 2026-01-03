@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lucky Spin - Final Fix</title>
+    <title>Lucky Spin - Final Version</title>
     <style>
         body { 
             font-family: Arial, sans-serif; text-align: center; background-color: #2c3e50; 
-            color: white; margin: 0; padding: 20px;
-            user-select: none; -webkit-user-select: none;
+            color: white; margin: 0; padding: 20px; user-select: none;
         }
         .container { max-width: 450px; margin: auto; background: #34495e; padding: 20px; border-radius: 15px; }
         
@@ -16,7 +15,7 @@
         #canvas-container { position: relative; width: 320px; height: 320px; margin: 20px auto; }
         canvas { width: 100%; height: 100%; border-radius: 50%; border: 8px solid #ecf0f1; background: #fff; display: block; }
         
-        /* Panah Kuning */
+        /* Panah Penunjuk */
         .pointer { 
             position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
             width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent;
@@ -26,9 +25,9 @@
         button { 
             margin-top: 20px; padding: 15px 40px; font-size: 18px; font-weight: bold; 
             cursor: pointer; background-color: #27ae60; color: white; border: none; 
-            border-radius: 50px; box-shadow: 0 4px 0 #1e8449;
+            border-radius: 50px; box-shadow: 0 4px 0 #1e8449; transition: 0.2s;
         }
-        button:disabled { background-color: #95a5a6; cursor: not-allowed; box-shadow: none; }
+        button:disabled { background-color: #95a5a6; cursor: not-allowed; box-shadow: none; transform: translateY(4px); }
 
         /* Modal Popup */
         .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); }
@@ -60,7 +59,7 @@
     </div>
 
     <script>
-        /** 1. PROTEKSI INSPECT & KLIK KANAN **/
+        /** PROTEKSI **/
         document.addEventListener('contextmenu', e => e.preventDefault());
         document.onkeydown = function(e) {
             if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74 || e.keyCode == 67)) || (e.ctrlKey && e.keyCode == 85)) {
@@ -68,7 +67,7 @@
             }
         };
 
-        /** 2. LOGIKA RODA **/
+        /** SETUP RODA **/
         const canvas = document.getElementById('wheelCanvas');
         const ctx = canvas.getContext('2d');
         const segments = ["ZONK", "BONUS 50K", "ZONK", "BONUS 100K", "ZONK", "BONUS 500K"];
@@ -78,18 +77,32 @@
         function drawWheel() {
             const arc = (2 * Math.PI) / segments.length;
             ctx.clearRect(0, 0, 400, 400);
+
             for (let i = 0; i < segments.length; i++) {
                 let angle = currentAngle + (i * arc);
-                ctx.fillStyle = colors[i];
+                
+                // Gambar Segmen (Slice)
                 ctx.beginPath();
+                ctx.fillStyle = colors[i];
                 ctx.moveTo(200, 200);
                 ctx.arc(200, 200, 200, angle, angle + arc);
+                ctx.lineTo(200, 200);
                 ctx.fill();
                 ctx.strokeStyle = "#fff";
+                ctx.lineWidth = 2;
                 ctx.stroke();
 
+                // Gambar Teks
                 ctx.save();
                 ctx.translate(200, 200);
                 ctx.rotate(angle + arc / 2);
+                ctx.textAlign = "right";
                 ctx.fillStyle = "white";
-                ctx.font
+                ctx.font = "bold 22px Arial";
+                ctx.fillText(segments[i], 180, 10);
+                ctx.restore();
+            }
+        }
+
+        function startSpin() {
+            if (localStorage.getItem("userHasSpun")) return;
