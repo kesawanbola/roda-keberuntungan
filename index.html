@@ -184,4 +184,14 @@
                 if (progress < 1) {
                     requestAnimationFrame(animate);
                 } else {
-                    result
+                    resultDisplay.innerHTML = "SELAMAT! Anda Mendapatkan:<br>" + segments[HASIL_SETTINGAN].replace('\n', ' ');
+                    btn.innerText = "KESEMPATAN HABIS";
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+
+        drawWheel();
+    </script>
+</body>
+</html>
