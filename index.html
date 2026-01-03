@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Roda Keberuntungan</title>
     <style>
-        /* CSS UNTUK TAMPILAN */
+        /* --- CSS ASLI --- */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             text-align: center;
@@ -14,7 +14,6 @@
             margin: 0;
             padding: 20px;
         }
-
         .container {
             max-width: 500px;
             margin: auto;
@@ -23,7 +22,6 @@
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-
         canvas {
             max-width: 100%;
             height: auto;
@@ -32,11 +30,7 @@
             border-radius: 50%;
             background: white;
         }
-
-        .controls {
-            margin-top: 30px;
-        }
-
+        .controls { margin-top: 30px; }
         button {
             padding: 15px 40px;
             font-size: 20px;
@@ -49,32 +43,49 @@
             transition: 0.3s;
             box-shadow: 0 4px 0 #1e8449;
         }
+        button:hover { background-color: #2ecc71; transform: translateY(-2px); }
+        button:disabled { background-color: #95a5a6; cursor: not-allowed; box-shadow: none; transform: none; }
+        #result { margin-top: 25px; font-size: 28px; font-weight: bold; min-height: 40px; color: #f1c40f; }
 
-        button:hover {
-            background-color: #2ecc71;
-            transform: translateY(-2px);
+        /* --- CSS TAMBAHAN UNTUK POP-UP --- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
         }
-
-        button:disabled {
-            background-color: #95a5a6;
-            cursor: not-allowed;
-            box-shadow: none;
-            transform: none;
+        .modal-content {
+            background-color: #ffffff;
+            color: #333;
+            margin: 15% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 80%;
+            max-width: 400px;
+            text-align: center;
+            animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
         }
-
-        #result {
-            margin-top: 25px;
-            font-size: 28px;
+        @keyframes popIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+        .modal-content h2 { color: #27ae60; margin-top: 0; }
+        .modal-content p { font-size: 16px; line-height: 1.5; margin: 20px 0; }
+        .btn-claim {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #f1c40f;
+            color: #000;
+            text-decoration: none;
             font-weight: bold;
-            min-height: 40px;
-            color: #f1c40f;
+            border-radius: 5px;
+            transition: 0.3s;
         }
-
-        .info {
-            font-size: 14px;
-            color: #bdc3c7;
-            margin-top: 10px;
-        }
+        .btn-claim:hover { background-color: #d4ac0d; }
     </style>
 </head>
 <body>
@@ -82,15 +93,19 @@
     <div class="container">
         <h1>🎡 Lucky Spin</h1>
         <p>Coba keberuntunganmu hari ini!</p>
-        
         <canvas id="canvas" width="400" height="400"></canvas>
-        
         <div class="controls">
             <button id="spinBtn" onclick="spinWheel()">PUTAR SEKARANG</button>
         </div>
-
         <div id="result"></div>
-        <p class="info">*Kesempatan hanya 1 kali per orang</p>
+    </div>
+
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <h2>🎉 SELAMAT!</h2>
+            <p id="modalMessage"></p>
+            <a href="https://shortio.link/login-kesawanbola" class="btn-claim">KLIK DISINI UNTUK LOGIN</a>
+        </div>
     </div>
 
     <script>
@@ -98,25 +113,22 @@
         const ctx = canvas.getContext('2d');
         const btn = document.getElementById('spinBtn');
         const resultDisplay = document.getElementById('result');
+        const modal = document.getElementById('myModal');
+        const modalMsg = document.getElementById('modalMessage');
 
-        // --- KONFIGURASI RODA ---
         const segments = ["ZONK", "BONUS 50K", "ZONK", "BONUS 100K", "ZONK", "BONUS 500K"];
         const colors = ["#e74c3c", "#3498db", "#e74c3c", "#9b59b6", "#e74c3c", "#f1c40f"];
         
-        // --- SETTINGAN HASIL (Ubah angka ini: 0-5) ---
-        // 0=Zonk, 1=Hadiah 1, 2=Zonk, 3=Hadiah 2, 4=Zonk, 5=JACKPOT
+        // Target hasil (1, 3, atau 5 untuk menang)
         const HASIL_SETTINGAN = 5; 
         
         let startAngle = 0;
         const arc = Math.PI / (segments.length / 2);
 
-        // 1. FUNGSI MENGGAMBAR RODA
         function drawWheel() {
             ctx.clearRect(0, 0, 400, 400);
             for (let i = 0; i < segments.length; i++) {
                 let angle = startAngle + i * arc;
-                
-                // Gambar potongan roti (slice)
                 ctx.fillStyle = colors[i];
                 ctx.beginPath();
                 ctx.moveTo(200, 200);
@@ -127,7 +139,6 @@
                 ctx.lineWidth = 2;
                 ctx.stroke();
 
-                // Gambar teks
                 ctx.save();
                 ctx.fillStyle = "white";
                 ctx.font = "bold 16px Arial";
@@ -137,46 +148,39 @@
                 ctx.restore();
             }
 
-            // Gambar panah penunjuk (statis di atas)
+            // Panah penunjuk
             ctx.fillStyle = "#fff";
             ctx.beginPath();
-            ctx.moveTo(200 - 10, 20);
-            ctx.lineTo(200 + 10, 20);
-            ctx.lineTo(200, 40);
+            ctx.moveTo(200 - 10, 20); ctx.lineTo(200 + 10, 20); ctx.lineTo(200, 40);
             ctx.fill();
         }
 
-        // 2. CEK APAKAH SUDAH PERNAH MAIN SAAT HALAMAN DIBUKA
         window.onload = function() {
             if (localStorage.getItem("userHasSpun")) {
                 btn.disabled = true;
                 btn.innerText = "KESEMPATAN HABIS";
-                resultDisplay.innerHTML = "Kamu sudah memutar roda!";
             }
             drawWheel();
         };
 
-        // 3. FUNGSI PUTAR RODA
         function spinWheel() {
             if (localStorage.getItem("userHasSpun")) return;
 
             btn.disabled = true;
             resultDisplay.innerHTML = "Semoga beruntung...";
 
-            const totalRounds = 8; // Berputar 8 kali
-            // Kalkulasi sudut agar berhenti tepat di target settingan
+            const totalRounds = 8;
             const degreesPerSegment = 360 / segments.length;
             const stopAngleValue = (totalRounds * 360) + (360 - (HASIL_SETTINGAN * degreesPerSegment)) - (degreesPerSegment / 2) - 90;
             
             let startTimestamp = null;
-            const duration = 5000; // Durasi putaran 5 detik
+            const duration = 5000;
 
             function animate(timestamp) {
                 if (!startTimestamp) startTimestamp = timestamp;
                 const elapsed = timestamp - startTimestamp;
                 const progress = Math.min(elapsed / duration, 1);
 
-                // Efek perlambatan yang halus (Cubic Ease Out)
                 const easeOut = 1 - Math.pow(1 - progress, 3);
                 const currentDegree = easeOut * stopAngleValue;
                 
@@ -186,10 +190,19 @@
                 if (progress < 1) {
                     requestAnimationFrame(animate);
                 } else {
-                    // SELESAI
-                    resultDisplay.innerHTML = "SELAMAT! Kamu dapat: " + segments[HASIL_SETTINGAN];
-                  // localStorage.setItem("userHasSpun", "true"); // Kunci status
+                    // LOGIKA SETELAH BERHENTI
+                    const finalResult = segments[HASIL_SETTINGAN];
+                    resultDisplay.innerHTML = "HASIL: " + finalResult;
+                    localStorage.setItem("userHasSpun", "true");
                     btn.innerText = "KESEMPATAN HABIS";
+
+                    // Cek jika indeks adalah 1, 3, atau 5
+                    if ([1, 3, 5].includes(HASIL_SETTINGAN)) {
+                        setTimeout(() => {
+                            modalMsg.innerHTML = `SELAMAT KAMU MENDAPATKAN <b>${finalResult}</b> PADA GAME MAHJONG WAYS 2, SILAHKAN LOGIN DAN MAINKAN !`;
+                            modal.style.display = "block";
+                        }, 500);
+                    }
                 }
             }
             requestAnimationFrame(animate);
