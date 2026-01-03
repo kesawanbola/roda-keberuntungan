@@ -1,7 +1,51 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  
+    <script>
+        function spinWheel() {
+    // 1. CEK DULU: Jika sudah ada tanda di browser, jangan jalankan apapun
+    if (localStorage.getItem("userHasSpun")) {
+        alert("Kamu sudah menggunakan kesempatanmu!");
+        return;
+    }
+
+    // 2. LANGSUNG KUNCI: Begitu diklik, langsung simpan status "Sudah Main"
+    // Ini mencegah orang me-refresh halaman saat roda sedang berputar
+    localStorage.setItem("userHasSpun", "true");
+
+    // 3. MATIKAN TOMBOL: Agar tidak bisa diklik dua kali
+    btn.disabled = true;
+    btn.style.background = "#95a5a6";
+    btn.innerText = "PROSES...";
+    resultDisplay.innerHTML = "Semoga beruntung...";
+
+    const totalRounds = 8;
+    const degreesPerSegment = 360 / segments.length;
+    const stopAngleValue = (totalRounds * 360) + (360 - (HASIL_SETTINGAN * degreesPerSegment)) - (degreesPerSegment / 2) - 90;
+    
+    let startTimestamp = null;
+    const duration = 5000;
+
+    function animate(timestamp) {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const elapsed = timestamp - startTimestamp;
+        const progress = Math.min(elapsed / duration, 1);
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+        const currentDegree = easeOut * stopAngleValue;
+        
+        startAngle = (currentDegree * Math.PI / 180);
+        drawWheel();
+
+        if (progress < 1) {
+            requestAnimationFrame(animate);
+        } else {
+            resultDisplay.innerHTML = "SELAMAT! Kamu dapat: " + segments[HASIL_SETTINGAN];
+            btn.innerText = "KESEMPATAN HABIS";
+        }
+    }
+    requestAnimationFrame(animate);
+}
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Roda Keberuntungan</title>
