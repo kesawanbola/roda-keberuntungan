@@ -110,4 +110,68 @@
             const btn = document.getElementById('spinBtn');
             const targetIndex = Math.floor(Math.random() * segments.length);
             // Putar minimal 10 kali putaran + target
-            const stop
+            const stopAngle = (10 * 360) + (360 - (targetIndex * 60)) - 90;
+            
+            let start = null;
+            btn.disabled = true;
+
+            function animate(time) {
+                if (!start) start = time;
+                let elapsed = time - start;
+                let progress = Math.min(elapsed / 5000, 1);
+                
+                // Ease Out (Mulai cepat, berhenti pelan)
+                let easeOut = 1 - Math.pow(1 - progress, 3);
+                currentAngle = (easeOut * stopAngle) * (Math.PI / 180);
+                
+                drawWheel();
+
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    finishGame(targetIndex);
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+
+        function finishGame(idx) {
+            localStorage.setItem("alreadySpun", "true");
+            const hasil = segments[idx];
+            document.getElementById('resultDisplay').innerText = "HASIL: " + hasil;
+            
+            setTimeout(() => {
+                const modal = document.getElementById('resultModal');
+                const title = document.getElementById('modalTitle');
+                const msg = document.getElementById('modalMsg');
+                
+                if ([1, 3, 5].includes(idx)) {
+                    title.innerText = "🎉 SELAMAT!";
+                    title.style.color = "#27ae60";
+                    msg.innerHTML = `SELAMAT KAMU MENDAPATKAN BONUS KEMENANGAN <b>${hasil}</b> PADA GAME MAHJONG WAYS 2, SILAHKAN LOGIN DAN MAINKAN!`;
+                } else {
+                    title.innerText = "💔 YAHH...";
+                    title.style.color = "#e74c3c";
+                    msg.innerText = "YAH KURANG BERUNTUNG, BOSKU BISA COBA LOGIN DAN MAINKAN MAHJONG WAYS 2 NYA YA.";
+                }
+                modal.style.display = "block";
+            }, 500);
+        }
+
+        // Jalankan Inisialisasi
+        if (localStorage.getItem("alreadySpun")) {
+            document.getElementById('spinBtn').disabled = true;
+            document.getElementById('spinBtn').innerText = "KESEMPATAN HABIS";
+        }
+
+        // Loop Draw untuk memastikan canvas tidak kosong saat loading
+        let attempts = 0;
+        const autoDraw = setInterval(() => {
+            drawWheel();
+            attempts++;
+            if (attempts > 10) clearInterval(autoDraw);
+        }, 100);
+
+    </script>
+</body>
+</html>
