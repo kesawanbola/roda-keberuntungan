@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lucky Spin - Akurasi 100%</title>
+    <title>Lucky Spin - Final Fix</title>
     <style>
         body {
             font-family: 'Segoe UI', sans-serif; text-align: center; 
@@ -15,7 +15,6 @@
         #wheel-wrapper { position: relative; width: 350px; height: 350px; margin: 20px auto; }
         canvas { width: 100%; height: 100%; border-radius: 50%; border: 8px solid #ecf0f1; background: #fff; }
         
-        /* Panah Kuning di posisi Jam 12 tepat */
         .pointer { 
             position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
             width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent;
@@ -27,12 +26,13 @@
             background-color: #27ae60; color: white; border: none; border-radius: 50px;
             box-shadow: 0 4px 0 #1e8449; transition: 0.2s;
         }
-        /* Style saat tombol dimatikan */
+
+        /* PERBAIKAN: CSS agar tombol terlihat mati (abu-abu) */
         button:disabled { 
             background-color: #95a5a6 !important; 
-            cursor: not-allowed; 
-            box-shadow: none; 
-            transform: none;
+            box-shadow: none !important;
+            cursor: not-allowed;
+            transform: none !important;
         }
 
         .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); }
@@ -65,18 +65,17 @@
         const ctx = canvas.getContext('2d');
         const spinBtn = document.getElementById('spinBtn');
         
-        // DATA SEGMEN
         const segments = ["ZONK", "BONUS 50K", "ZONK", "BONUS 100K", "ZONK", "BONUS 500K"];
         const colors = ["#e74c3c", "#3498db", "#e74c3c", "#9b59b6", "#e74c3c", "#f1c40f"];
         
         let currentAngle = 0;
         const segmentArc = (2 * Math.PI) / segments.length;
 
-        // FUNGSI CEK STATUS (Agar refresh tidak bisa spin lagi)
+        /* PERBAIKAN: Fungsi pengecekan saat refresh */
         function checkStatus() {
             if (localStorage.getItem("isDone") === "true") {
-                spinBtn.disabled = true;
-                spinBtn.innerText = "HANYA BISA 1X SPIN";
+                spinBtn.disabled = true; // Menonaktifkan tombol secara teknis
+                spinBtn.innerText = "HANYA BISA 1X SPIN"; // Mengubah teks tombol
             }
         }
 
@@ -106,18 +105,15 @@
         }
 
         function startSpin() {
-            // Validasi double check
             if (localStorage.getItem("isDone") === "true") return;
 
             const targetIdx = Math.floor(Math.random() * segments.length);
             const degreesPerSegment = 360 / segments.length;
-
             const stopAngle = (12 * 360) + (360 - (targetIdx * degreesPerSegment)) - 90 - (degreesPerSegment / 2);
             
             let start = null;
             const duration = 5000;
             
-            // Matikan tombol seketika saat diklik
             spinBtn.disabled = true;
             spinBtn.innerText = "MEMUTAR...";
 
@@ -125,7 +121,6 @@
                 if (!start) start = time;
                 const elapsed = time - start;
                 const progress = Math.min(elapsed / duration, 1);
-                
                 const easeOut = 1 - Math.pow(1 - progress, 4);
                 currentAngle = (easeOut * stopAngle) * (Math.PI / 180);
                 
@@ -144,7 +139,7 @@
             const hasil = segments[idx];
             document.getElementById('resultText').innerText = "HASIL: " + hasil;
             
-            // SIMPAN STATUS KE BROWSER
+            // Simpan status agar setelah refresh tombol tetap mati
             localStorage.setItem("isDone", "true");
             spinBtn.innerText = "HANYA BISA 1X SPIN";
 
@@ -166,11 +161,10 @@
             }, 500);
         }
 
-        // Jalankan Pengecekan dan Gambar Awal saat halaman dibuka
+        // Panggil pengecekan status saat load
         checkStatus();
         draw();
 
-        // Anti Inspect Element & Klik Kanan
         document.addEventListener('contextmenu', e => e.preventDefault());
         document.onkeydown = e => { if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && [73, 74, 67].includes(e.keyCode)) || (e.ctrlKey && e.keyCode == 85)) return false; };
     </script>
