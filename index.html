@@ -1,85 +1,195 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-    <title>Roda Keberuntungan - Spesial</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roda Keberuntungan</title>
     <style>
-        body { text-align: center; font-family: sans-serif; background: #f0f0f0; }
-        #canvas { margin-top: 20px; border: 5px solid #333; border-radius: 50%; background: white; }
-        .controls { margin-top: 20px; }
-        button { padding: 10px 20px; font-size: 18px; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 5px; }
-        #result { margin-top: 20px; font-size: 36px; font-weight: bold; color: #c0392b; }
+        /* CSS UNTUK TAMPILAN */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            background-color: #2c3e50;
+            color: white;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background: #34495e;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+            margin-top: 20px;
+            border: 8px solid #ecf0f1;
+            border-radius: 50%;
+            background: white;
+        }
+
+        .controls {
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 15px 40px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            transition: 0.3s;
+            box-shadow: 0 4px 0 #1e8449;
+        }
+
+        button:hover {
+            background-color: #2ecc71;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        #result {
+            margin-top: 25px;
+            font-size: 28px;
+            font-weight: bold;
+            min-height: 40px;
+            color: #f1c40f;
+        }
+
+        .info {
+            font-size: 14px;
+            color: #bdc3c7;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
 
-    <h1>Putar Rodanya!</h1>
-    <canvas id="canvas" width="400" height="400"></canvas>
-    <div class="controls">
-        <button onclick="spinWheel()">PUTAR SEKARANG</button>
+    <div class="container">
+        <h1>🎡 Lucky Spin</h1>
+        <p>Coba keberuntunganmu hari ini!</p>
+        
+        <canvas id="canvas" width="400" height="400"></canvas>
+        
+        <div class="controls">
+            <button id="spinBtn" onclick="spinWheel()">PUTAR SEKARANG</button>
+        </div>
+
+        <div id="result"></div>
+        <p class="info">*Kesempatan hanya 1 kali per orang</p>
     </div>
-    <div id="result"></div>
 
     <script>
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
-        const segments = ["ZONK", "BONUS KEMENANGAN 50K", "ZONK", "BONUS KEMENANGAN 100K", "ZONK", "SALDO 500K"];
+        const btn = document.getElementById('spinBtn');
+        const resultDisplay = document.getElementById('result');
+
+        // --- KONFIGURASI RODA ---
+        const segments = ["ZONK", "HADIAH 1", "ZONK", "HADIAH 2", "ZONK", "JACKPOT"];
         const colors = ["#e74c3c", "#3498db", "#e74c3c", "#9b59b6", "#e74c3c", "#f1c40f"];
+        
+        // --- SETTINGAN HASIL (Ubah angka ini: 0-5) ---
+        // 0=Zonk, 1=Hadiah 1, 2=Zonk, 3=Hadiah 2, 4=Zonk, 5=JACKPOT
+        const HASIL_SETTINGAN = 5; 
         
         let startAngle = 0;
         const arc = Math.PI / (segments.length / 2);
-        let spinTimeout = null;
 
-        // --- BAGIAN SETTINGAN ---
-        // Ganti angka ini untuk menentukan hasil: 
-        // 0=Zonk, 1=Hadiah 1, 2=Zonk, 3=Hadiah 2, 4=Zonk, 5=JACKPOT
-        const HASIL_SETTINGAN = 0; 
-        // ------------------------
-
+        // 1. FUNGSI MENGGAMBAR RODA
         function drawWheel() {
             ctx.clearRect(0, 0, 400, 400);
             for (let i = 0; i < segments.length; i++) {
                 let angle = startAngle + i * arc;
+                
+                // Gambar potongan roti (slice)
                 ctx.fillStyle = colors[i];
                 ctx.beginPath();
                 ctx.moveTo(200, 200);
                 ctx.arc(200, 200, 190, angle, angle + arc, false);
                 ctx.lineTo(200, 200);
                 ctx.fill();
+                ctx.strokeStyle = "#fff";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Gambar teks
                 ctx.save();
                 ctx.fillStyle = "white";
-                ctx.translate(200 + Math.cos(angle + arc / 2) * 130, 200 + Math.sin(angle + arc / 2) * 130);
-                ctx.rotate(angle + arc / 2);
+                ctx.font = "bold 16px Arial";
+                ctx.translate(200 + Math.cos(angle + arc / 2) * 120, 200 + Math.sin(angle + arc / 2) * 120);
+                ctx.rotate(angle + arc / 2 + Math.PI / 2);
                 ctx.fillText(segments[i], -ctx.measureText(segments[i]).width / 2, 0);
                 ctx.restore();
             }
+
+            // Gambar panah penunjuk (statis di atas)
+            ctx.fillStyle = "#fff";
+            ctx.beginPath();
+            ctx.moveTo(200 - 10, 20);
+            ctx.lineTo(200 + 10, 20);
+            ctx.lineTo(200, 40);
+            ctx.fill();
         }
 
-        function spinWheel() {
-            document.getElementById('result').innerHTML = "Memutar...";
-            
-            // Logika agar berhenti di index yang kita mau
-            const totalRounds = 5; // Putar 5 kali sebelum berhenti
-            const stopAngle = (totalRounds * 360) + (360 - (HASIL_SETTINGAN * (360/segments.length))) - ((360/segments.length)/2);
-            
-            let currentRotation = 0;
-            const duration = 4000; // 4 detik
-            const start = performance.now();
+        // 2. CEK APAKAH SUDAH PERNAH MAIN SAAT HALAMAN DIBUKA
+        window.onload = function() {
+            if (localStorage.getItem("userHasSpun")) {
+                btn.disabled = true;
+                btn.innerText = "KESEMPATAN HABIS";
+                resultDisplay.innerHTML = "Kamu sudah memutar roda!";
+            }
+            drawWheel();
+        };
 
-            function animate(now) {
-                let elapsed = now - start;
-                let progress = Math.min(elapsed / duration, 1);
+        // 3. FUNGSI PUTAR RODA
+        function spinWheel() {
+            if (localStorage.getItem("userHasSpun")) return;
+
+            btn.disabled = true;
+            resultDisplay.innerHTML = "Semoga beruntung...";
+
+            const totalRounds = 8; // Berputar 8 kali
+            // Kalkulasi sudut agar berhenti tepat di target settingan
+            const degreesPerSegment = 360 / segments.length;
+            const stopAngleValue = (totalRounds * 360) + (360 - (HASIL_SETTINGAN * degreesPerSegment)) - (degreesPerSegment / 2) - 90;
+            
+            let startTimestamp = null;
+            const duration = 5000; // Durasi putaran 5 detik
+
+            function animate(timestamp) {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const elapsed = timestamp - startTimestamp;
+                const progress = Math.min(elapsed / duration, 1);
+
+                // Efek perlambatan yang halus (Cubic Ease Out)
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                const currentDegree = easeOut * stopAngleValue;
                 
-                // Efek perlambatan (ease-out)
-                let easeOut = 1 - Math.pow(1 - progress, 3);
-                let currentAngle = easeOut * stopAngle;
-                
-                startAngle = (currentAngle * Math.PI / 180);
+                startAngle = (currentDegree * Math.PI / 180);
                 drawWheel();
 
                 if (progress < 1) {
                     requestAnimationFrame(animate);
                 } else {
-                    document.getElementById('result').innerHTML = "Hasil: " + segments[HASIL_SETTINGAN];
+                    // SELESAI
+                    resultDisplay.innerHTML = "SELAMAT! Kamu dapat: " + segments[HASIL_SETTINGAN];
+                    localStorage.setItem("userHasSpun", "true"); // Kunci status
+                    btn.innerText = "KESEMPATAN HABIS";
                 }
             }
             requestAnimationFrame(animate);
