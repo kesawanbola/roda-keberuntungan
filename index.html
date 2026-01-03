@@ -3,32 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lucky Spin Fix</title>
+    <title>Lucky Spin - Final Fix</title>
     <style>
-        /* CSS TETAP SAMA SEPERTI SEBELUMNYA */
-        body { font-family: sans-serif; text-align: center; background-color: #2c3e50; color: white; padding: 20px; margin: 0; user-select: none; }
-        .container { max-width: 450px; margin: auto; background: #34495e; padding: 20px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
-        #canvas-container { position: relative; width: 350px; height: 350px; margin: 20px auto; }
-        canvas { width: 100%; height: 100%; border: 10px solid #ecf0f1; border-radius: 50%; background-color: #fff; display: block; }
-        .pointer { 
-            position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
-            width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent;
-            border-top: 30px solid #f1c40f; z-index: 10;
+        body { 
+            font-family: Arial, sans-serif; text-align: center; background-color: #2c3e50; 
+            color: white; margin: 0; padding: 20px;
+            user-select: none; -webkit-user-select: none;
         }
-        .controls { margin-top: 20px; }
+        .container { max-width: 450px; margin: auto; background: #34495e; padding: 20px; border-radius: 15px; }
+        
+        /* Container Roda */
+        #canvas-container { position: relative; width: 320px; height: 320px; margin: 20px auto; }
+        canvas { width: 100%; height: 100%; border-radius: 50%; border: 8px solid #ecf0f1; background: #fff; display: block; }
+        
+        /* Panah Kuning */
+        .pointer { 
+            position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+            width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent;
+            border-top: 25px solid #f1c40f; z-index: 10;
+        }
+
         button { 
-            padding: 15px 30px; font-size: 18px; font-weight: bold; cursor: pointer;
-            background-color: #27ae60; color: white; border: none; border-radius: 50px;
-            box-shadow: 0 4px 0 #1e8449; transition: 0.2s;
+            margin-top: 20px; padding: 15px 40px; font-size: 18px; font-weight: bold; 
+            cursor: pointer; background-color: #27ae60; color: white; border: none; 
+            border-radius: 50px; box-shadow: 0 4px 0 #1e8449;
         }
         button:disabled { background-color: #95a5a6; cursor: not-allowed; box-shadow: none; }
-        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); }
-        .modal-content { background: white; color: #333; margin: 15% auto; padding: 30px; border-radius: 15px; width: 80%; max-width: 400px; }
-        .btn-link { display: inline-block; margin-top: 20px; padding: 12px 24px; background: #f1c40f; color: black; text-decoration: none; font-weight: bold; border-radius: 5px; }
+
+        /* Modal Popup */
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); }
+        .modal-content { background: white; color: #333; margin: 20% auto; padding: 30px; border-radius: 15px; width: 80%; max-width: 350px; }
+        .btn-link { display: inline-block; margin-top: 15px; padding: 12px 20px; background: #f1c40f; color: black; text-decoration: none; font-weight: bold; border-radius: 5px; }
     </style>
 </head>
-<body oncontextmenu="return false;"> <div class="container">
-        <h1>🎡 Lucky Spin</h1>
+<body oncontextmenu="return false;">
+
+    <div class="container">
+        <h2>🎡 Lucky Spin</h2>
         <p>Coba keberuntunganmu hari ini!</p>
         
         <div id="canvas-container">
@@ -36,10 +47,8 @@
             <canvas id="wheelCanvas" width="400" height="400"></canvas>
         </div>
 
-        <div class="controls">
-            <button id="spinBtn">PUTAR SEKARANG</button>
-        </div>
-        <h2 id="resultDisplay" style="color:#f1c40f; margin-top:20px;"></h2>
+        <button id="spinBtn" onclick="startSpin()">PUTAR SEKARANG</button>
+        <h3 id="resultDisplay" style="color:#f1c40f; margin-top:20px;"></h3>
     </div>
 
     <div id="resultModal" class="modal">
@@ -51,101 +60,36 @@
     </div>
 
     <script>
-        // --- PROTEKSI TAMBAHAN: MENCEGAH SHORTCUT INSPECT ELEMENT ---
-        document.addEventListener('keydown', function(e) {
-            if (e.ctrlKey && (e.key === 'u' || e.key === 'i' || e.key === 'j' || e.key === 's')) {
-                e.preventDefault();
+        /** 1. PROTEKSI INSPECT & KLIK KANAN **/
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.onkeydown = function(e) {
+            if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74 || e.keyCode == 67)) || (e.ctrlKey && e.keyCode == 85)) {
+                return false;
             }
-            if (e.key === 'F12') {
-                e.preventDefault();
-            }
-        });
+        };
 
-        // KODE JAVASCRIPT RODA TETAP SAMA
+        /** 2. LOGIKA RODA **/
         const canvas = document.getElementById('wheelCanvas');
         const ctx = canvas.getContext('2d');
-        const spinBtn = document.getElementById('spinBtn');
-        const resultDisplay = document.getElementById('resultDisplay');
-        const modal = document.getElementById('resultModal');
-        
         const segments = ["ZONK", "BONUS 50K", "ZONK", "BONUS 100K", "ZONK", "BONUS 500K"];
         const colors = ["#e74c3c", "#3498db", "#e74c3c", "#9b59b6", "#e74c3c", "#f1c40f"];
-        
         let currentAngle = 0;
-        const segmentAngle = (2 * Math.PI) / segments.length;
 
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            segments.forEach((text, i) => {
-                const angle = currentAngle + (i * segmentAngle);
-                ctx.beginPath();
+        function drawWheel() {
+            const arc = (2 * Math.PI) / segments.length;
+            ctx.clearRect(0, 0, 400, 400);
+            for (let i = 0; i < segments.length; i++) {
+                let angle = currentAngle + (i * arc);
                 ctx.fillStyle = colors[i];
+                ctx.beginPath();
                 ctx.moveTo(200, 200);
-                ctx.arc(200, 200, 200, angle, angle + segmentAngle);
-                ctx.lineTo(200, 200);
+                ctx.arc(200, 200, 200, angle, angle + arc);
                 ctx.fill();
-                ctx.strokeStyle = "white";
-                ctx.lineWidth = 2;
+                ctx.strokeStyle = "#fff";
                 ctx.stroke();
 
                 ctx.save();
                 ctx.translate(200, 200);
-                ctx.rotate(angle + segmentAngle / 2);
-                ctx.textAlign = "right";
+                ctx.rotate(angle + arc / 2);
                 ctx.fillStyle = "white";
-                ctx.font = "bold 18px Arial";
-                ctx.fillText(text, 180, 10);
-                ctx.restore();
-            });
-        }
-
-        function startSpin() {
-            if (localStorage.getItem("doneSpin")) return;
-            const randomIndex = Math.floor(Math.random() * segments.length);
-            const stopAngle = (10 * 360) + (360 - (randomIndex * 60)) - 90;
-            let start = null;
-            const duration = 5000;
-
-            function animate(time) {
-                if (!start) start = time;
-                const elapsed = time - start;
-                const progress = Math.min(elapsed / duration, 1);
-                const easeOut = 1 - Math.pow(1 - progress, 3);
-                currentAngle = (easeOut * stopAngle) * (Math.PI / 180);
-                draw();
-                if (progress < 1) { requestAnimationFrame(animate); } 
-                else { finishSpin(randomIndex); }
-            }
-            spinBtn.disabled = true;
-            requestAnimationFrame(animate);
-        }
-
-        function finishSpin(index) {
-            const hasil = segments[index];
-            resultDisplay.innerText = "HASIL: " + hasil;
-            localStorage.setItem("doneSpin", "true");
-            setTimeout(() => {
-                const title = document.getElementById('modalTitle');
-                const msg = document.getElementById('modalMsg');
-                if ([1, 3, 5].includes(index)) {
-                    title.innerText = "🎉 SELAMAT!";
-                    title.style.color = "green";
-                    msg.innerHTML = `SELAMAT KAMU MENDAPATKAN BONUS KEMENANGAN <b>${hasil}</b> PADA GAME MAHJONG WAYS 2, SILAHKAN LOGIN DAN MAINKAN!`;
-                } else {
-                    title.innerText = "💔 YAHH...";
-                    title.style.color = "red";
-                    msg.innerText = "YAH KURANG BERUNTUNG, BOSKU BISA COBA LOGIN DAN MAINKAN MAHJONG WAYS 2 NYA YA.";
-                }
-                modal.style.display = "block";
-            }, 500);
-        }
-
-        spinBtn.addEventListener('click', startSpin);
-        if (localStorage.getItem("doneSpin")) {
-            spinBtn.disabled = true;
-            spinBtn.innerText = "KESEMPATAN HABIS";
-        }
-        draw();
-    </script>
-</body>
-</html>
+                ctx.font
