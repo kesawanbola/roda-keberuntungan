@@ -6,13 +6,13 @@
     <title>Lucky Spin - Akurasi 100%</title>
     <style>
         body {
-            font-family: sans-serif; text-align: center; background-color: #2c3e50; 
-            color: white; margin: 0; padding: 20px; user-select: none;
+            font-family: 'Segoe UI', sans-serif; text-align: center; 
+            background-color: #2c3e50; color: white; margin: 0; padding: 20px;
+            user-select: none;
         }
         .container { max-width: 450px; margin: auto; background: #34495e; padding: 20px; border-radius: 15px; }
         
-        /* Container untuk kalibrasi panah */
-        #wheel-wrapper { position: relative; width: 320px; height: 320px; margin: 20px auto; }
+        #wheel-wrapper { position: relative; width: 350px; height: 350px; margin: 20px auto; }
         canvas { width: 100%; height: 100%; border-radius: 50%; border: 8px solid #ecf0f1; background: #fff; }
         
         /* Panah Kuning di posisi Jam 12 tepat */
@@ -29,7 +29,6 @@
         }
         button:disabled { background-color: #95a5a6; cursor: not-allowed; box-shadow: none; }
 
-        /* Modal */
         .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); }
         .modal-content { background: white; color: #333; margin: 15% auto; padding: 30px; border-radius: 15px; width: 80%; max-width: 380px; }
         .btn-link { display: inline-block; margin-top: 20px; padding: 12px 25px; background: #f1c40f; color: black; text-decoration: none; font-weight: bold; border-radius: 5px; }
@@ -56,14 +55,10 @@
     </div>
 
     <script>
-        // PROTEKSI
-        document.addEventListener('contextmenu', e => e.preventDefault());
-        document.onkeydown = e => { if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && [73, 74, 67].includes(e.keyCode)) || (e.ctrlKey && e.keyCode == 85)) return false; };
-
         const canvas = document.getElementById('wheelCanvas');
         const ctx = canvas.getContext('2d');
         
-        // SUSUNAN DATA (Urutan Searah Jarum Jam)
+        // DATA SEGMEN (Sesuai urutan visual yang Anda inginkan)
         const segments = ["ZONK", "BONUS 50K", "ZONK", "BONUS 100K", "ZONK", "BONUS 500K"];
         const colors = ["#e74c3c", "#3498db", "#e74c3c", "#9b59b6", "#e74c3c", "#f1c40f"];
         
@@ -73,9 +68,8 @@
         function draw() {
             ctx.clearRect(0, 0, 500, 500);
             for (let i = 0; i < segments.length; i++) {
-                const angle = currentAngle + (i * segmentArc);
-                
                 // Gambar Segmen
+                const angle = currentAngle + (i * segmentArc);
                 ctx.beginPath();
                 ctx.fillStyle = colors[i];
                 ctx.moveTo(250, 250);
@@ -86,7 +80,7 @@
                 ctx.lineWidth = 3;
                 ctx.stroke();
 
-                // Gambar Teks Hadiah
+                // Gambar Teks
                 ctx.save();
                 ctx.translate(250, 250);
                 ctx.rotate(angle + segmentArc / 2);
@@ -102,14 +96,14 @@
             if (localStorage.getItem("isDone")) return;
 
             const targetIdx = Math.floor(Math.random() * segments.length);
-            
-            /* RUMUS KALIBRASI AKURASI:
-               1. totalRounds * 360 (Putaran awal)
-               2. (targetIdx * (360/6)) (Mencari posisi indeks)
-               3. -90 (Kompensasi karena Jam 12 adalah -90 derajat dari sistem Canvas)
-               4. - (360/6 / 2) (Supaya berhenti tepat di TENGAH kotak, bukan di garis)
-            */
             const degreesPerSegment = 360 / segments.length;
+
+            /* LOGIKA AKURASI:
+               1. totalRounds * 360 (Putaran cepat)
+               2. (360 - (targetIdx * degreesPerSegment)) (Mencari derajat target)
+               3. - 90 (Kompensasi karena Jam 12 adalah posisi -90 derajat di sistem Canvas)
+               4. - (degreesPerSegment / 2) (Supaya berhenti tepat di TENGAH kotak)
+            */
             const stopAngle = (12 * 360) + (360 - (targetIdx * degreesPerSegment)) - 90 - (degreesPerSegment / 2);
             
             let start = null;
@@ -121,7 +115,7 @@
                 const elapsed = time - start;
                 const progress = Math.min(elapsed / duration, 1);
                 
-                // Efek melambat (Ease Out)
+                // Efek melambat (Cubic Ease Out)
                 const easeOut = 1 - Math.pow(1 - progress, 4);
                 currentAngle = (easeOut * stopAngle) * (Math.PI / 180);
                 
@@ -149,24 +143,22 @@
                 if ([1, 3, 5].includes(idx)) {
                     title.innerText = "🎉 SELAMAT!";
                     title.style.color = "green";
-                    msg.innerHTML = `Bosku Berhasil Mendapatkan <b>${hasil}</b>! Hubungi CS melalui link di bawah untuk klaim.`;
+                    msg.innerHTML = `Bosku Berhasil Mendapatkan <b>${hasil}</b>! Silahkan login untuk klaim kemenanganmu.`;
                 } else {
                     title.innerText = "💔 YAHH...";
                     title.style.color = "red";
-                    msg.innerText = "YAH KURANG BERUNTUNG, BOSKU BISA COBA LOGIN DAN MAINKAN MAHJONG WAYS 2 NYA YA.";
+                    msg.innerText = "YAH KURANG BERUNTUNG, COBA LAGI LAIN KALI YA BOSKU.";
                 }
                 modal.style.display = "block";
             }, 500);
         }
 
-        // Cek Status Awal
-        if (localStorage.getItem("isDone")) {
-            const btn = document.getElementById('spinBtn');
-            btn.disabled = true;
-            btn.innerText = "KESEMPATAN HABIS";
-        }
-        
+        // Jalankan Gambar Awal
         draw();
+
+        // Anti Inspect Element & Klik Kanan
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.onkeydown = e => { if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && [73, 74, 67].includes(e.keyCode)) || (e.ctrlKey && e.keyCode == 85)) return false; };
     </script>
 </body>
 </html>
