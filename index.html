@@ -154,7 +154,7 @@
             if (hasil !== "ZONK") {
                 title.innerText = "🎉 ANDA MENANG!";
                 title.style.color = "#27ae60";
-                msg.innerHTML = `Selamat! Anda berhak mendapatkan saldo sebesar <b>Rp ${hasil}</b>.`;
+                msg.innerHTML = `Selamat! Anda berhak mendapatkan Bonus sebesar <b>Rp ${hasil}</b>.`;
                 note.style.display = "block";
                 document.getElementById('resultText').innerHTML = `HASIL: Rp ${hasil} <br><small>(Status: <span class="status-badge">Menunggu Deposit</span>)</small>`;
             } else {
@@ -162,7 +162,7 @@
                 title.style.color = "#e74c3c";
                 msg.innerText = "Maaf, Anda kurang beruntung. Coba lagi di kesempatan berikutnya!";
                 note.style.display = "none";
-                document.getElementById('resultText').innerText = "COBA LAGI BESOK!";
+                document.getElementById('resultText').innerText = "BOSKU BISA CLAIM BONUS LAINNYA YA!";
             }
 
             // Memastikan modal muncul
@@ -179,7 +179,7 @@
                 if(lastWin && lastWin !== "ZONK") {
                    document.getElementById('resultText').innerHTML = `HASIL: Rp ${lastWin} <br><small>(Status: <span class="status-badge">Menunggu Deposit</span>)</small>`;
                 } else {
-                   document.getElementById('resultText').innerText = "COBA LAGI BESOK!";
+                   document.getElementById('resultText').innerText = "BOSKU BISA CLAIM BONUS LAINNYA YA!";
                 }
             }
             draw();
