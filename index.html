@@ -5,55 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
     <title>Lucky Spin Winner</title>
     <style>
-        body {
-            font-family: 'Segoe UI', sans-serif; text-align: center; 
-            background-color: #0f172a; color: white; margin: 0; padding: 20px;
-        }
-        .container { 
-            max-width: 400px; margin: auto; background: #1e293b; 
-            padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
-        }
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; background-color: #0f172a; color: white; margin: 0; padding: 20px; }
+        .container { max-width: 400px; margin: auto; background: #1e293b; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         #wheel-wrapper { position: relative; width: 300px; height: 300px; margin: 25px auto; }
-        canvas { 
-            width: 100% !important; height: 100% !important;
-            border-radius: 50%; border: 5px solid #f1c40f; 
-            background: #fff; display: block;
-        }
-        .pointer { 
-            position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
-            width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent;
-            border-top: 30px solid #f1c40f; z-index: 20;
-        }
-        #spinBtn { 
-            padding: 18px; font-size: 18px; font-weight: bold; cursor: pointer;
-            background-color: #ef4444; color: white; border: none; border-radius: 50px;
-            box-shadow: 0 5px 0 #b91c1c; transition: 0.1s; width: 100%;
-            text-transform: uppercase; margin-top: 10px;
-        }
+        canvas { width: 100% !important; height: 100% !important; border-radius: 50%; border: 5px solid #f1c40f; background: #fff; display: block; }
+        .pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 30px solid #f1c40f; z-index: 20; }
+        #spinBtn { padding: 18px; font-size: 18px; font-weight: bold; cursor: pointer; background-color: #ef4444; color: white; border: none; border-radius: 50px; box-shadow: 0 5px 0 #b91c1c; width: 100%; text-transform: uppercase; margin-top: 10px; }
         #spinBtn:disabled { background-color: #475569 !important; box-shadow: none !important; }
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); }
-        .modal-content { 
-            background: white; color: #333; margin: 15% auto; padding: 25px; 
-            border-radius: 20px; width: 85%; max-width: 350px; text-align: center; 
-        }
-        .btn-claim { 
-            display: inline-block; margin-top: 20px; padding: 15px 30px; 
-            background: #ef4444; color: white; text-decoration: none; 
-            font-weight: bold; border-radius: 50px; font-size: 16px; 
-        }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); }
+        .modal-content { background: white; color: #333; margin: 15% auto; padding: 25px; border-radius: 20px; width: 85%; max-width: 350px; text-align: center; }
+        .btn-claim { display: inline-block; margin-top: 20px; padding: 15px 30px; background: #ef4444; color: white; text-decoration: none; font-weight: bold; border-radius: 50px; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2 style="color: #f1c40f; margin-bottom: 5px;">🎡 Lucky Spin Winner</h2>
-        <p style="font-size: 14px; opacity: 0.8;">Putar roda dan amankan hadiah saldo harianmu!</p>
-        
+        <h2 style="color: #f1c40f;">🎡 Lucky Spin Winner</h2>
+        <p style="font-size: 14px; opacity: 0.8;">Putar roda dan dapatkan saldo harianmu!</p>
         <div id="wheel-wrapper">
             <div class="pointer"></div>
             <canvas id="wheelCanvas" width="500" height="500"></canvas>
         </div>
-        
         <button id="spinBtn" onclick="startSpin()">KLAIM SPIN GRATIS</button>
     </div>
 
@@ -61,8 +33,7 @@
         <div class="modal-content">
             <h2 id="modalTitle" style="color: #e67e22;">🎁 HADIAH TERKUNCI!</h2>
             <div id="modalMsg"></div>
-            <p style="font-weight: bold; color: #ef4444; margin-top: 10px;">Segera Aktivasi Sebelum Hangus!</p>
-            <a href="https://shortio.link/login-kesawanbola" class="btn-claim">AKTIVASI & KLAIM SEKARANG</a>
+            <a href="https://shortio.link/login-kesawanbola" class="btn-claim">AKTIVASI SEKARANG</a>
         </div>
     </div>
 
@@ -71,16 +42,17 @@
         const ctx = canvas.getContext('2d');
         const spinBtn = document.getElementById('spinBtn');
         
-        // Urutan segmen HARUS searah jarum jam untuk sinkronisasi rotasi
-        const segments = ["ZONK", "50K", "10K", "100K", "ZONK", "500K"];
-        const colors = ["#1e293b", "#3b82f6", "#1e293b", "#8b5cf6", "#1e293b", "#f1c40f"];
+        // SUSUNAN HADIAH (PENTING: Jangan diubah urutannya agar sinkron dengan putaran)
+        const segments = ["ZONK", "500K", "ZONK", "100K", "10K", "50K"];
+        const colors = ["#1e293b", "#f1c40f", "#1e293b", "#8b5cf6", "#1e293b", "#3b82f6"];
         let currentAngle = 0;
-        const segmentArc = (2 * Math.PI) / segments.length;
+        const numSegments = segments.length;
+        const segmentArc = (2 * Math.PI) / numSegments;
 
         function draw() {
             ctx.clearRect(0, 0, 500, 500);
-            for (let i = 0; i < segments.length; i++) {
-                // Gambar dimulai dari atas (-PI/2) agar index 0 sinkron dengan panah
+            for (let i = 0; i < numSegments; i++) {
+                // Rotasi awal dimulai dari atas (-90 derajat)
                 const angle = currentAngle + (i * segmentArc) - (Math.PI / 2);
                 ctx.beginPath();
                 ctx.fillStyle = colors[i];
@@ -96,7 +68,7 @@
                 ctx.rotate(angle + segmentArc / 2);
                 ctx.textAlign = "right";
                 ctx.fillStyle = "white";
-                ctx.font = "bold 35px Arial";
+                ctx.font = "bold 38px Arial";
                 ctx.fillText(segments[i], 220, 15);
                 ctx.restore();
             }
@@ -105,10 +77,53 @@
         window.onload = draw;
 
         function startSpin() {
-            if (localStorage.getItem("isDone") === "true") return;
+            if (localStorage.getItem("isSpinDone")) {
+                alert("Kesempatan Spin Habis!"); return;
+            }
 
             spinBtn.disabled = true;
             spinBtn.innerText = "SEDANG BERPUTAR...";
 
-            // Pilih target secara acak
-            const targetIdx =
+            // LOGIKA: Pilih hadiah (targetIdx)
+            // Contoh: idx 3 adalah 100K, idx 1 adalah 500K.
+            const targetIdx = Math.floor(Math.random() * numSegments);
+            
+            // Perhitungan rotasi agar berhenti tepat di tengah segmen pilihan
+            const extraRounds = 8; // Putar 8 kali
+            const segmentDeg = 360 / numSegments;
+            const targetRotation = (extraRounds * 360) + (360 - (targetIdx * segmentDeg));
+            
+            const targetAngle = targetRotation * (Math.PI / 180);
+            let startTime = null;
+
+            function animate(now) {
+                if (!startTime) startTime = now;
+                const progress = Math.min((now - startTime) / 5000, 1); // 5 Detik
+                const easeOut = 1 - Math.pow(1 - progress, 4);
+                currentAngle = easeOut * targetAngle;
+                draw();
+                if (progress < 1) requestAnimationFrame(animate);
+                else finalize(targetIdx);
+            }
+            requestAnimationFrame(animate);
+        }
+
+        function finalize(idx) {
+            const hasil = segments[idx];
+            localStorage.setItem("isSpinDone", "true");
+            
+            setTimeout(() => {
+                const modal = document.getElementById('resultModal');
+                const msg = document.getElementById('modalMsg');
+                const title = document.getElementById('modalTitle');
+
+                if (hasil !== "ZONK") {
+                    title.innerText = "🎁 HADIAH TERKUNCI!";
+                    msg.innerHTML = `<h1 style="font-size: 40px; color: #22c55e;">Rp ${hasil}</h1>
+                        <p style="text-align:left; background:#f3f4f6; padding:15px; border-radius:10px;">
+                        <b>STATUS:</b> <span style="color:red">BELUM AKTIF</span><br>
+                        Saldo hadiah akan otomatis masuk setelah Anda melakukan <b>Aktivasi Minimal Deposit 10rb</b>.
+                        </p>`;
+                } else {
+                    title.innerText = "YAHH, ZONK!";
+                    msg.innerHTML = `<p>Jangan menyerah! Hubungi admin untuk klaim <b>Bonus Garansi 10
