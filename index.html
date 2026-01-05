@@ -119,25 +119,32 @@
             }
         }
 
-        function startSpin() {
+      function startSpin() {
             if (localStorage.getItem("isDone") === "true") return;
 
-            const targetIdx = Math.floor(Math.random() * segments.length);
-            const degreesPerSegment = 360 / segments.length;
-            const stopAngle = (12 * 360) + (360 - (targetIdx * degreesPerSegment)) - 90 - (degreesPerSegment / 2);
+            const targetIdx = Math.floor(Math.random() * totalSegments);
+            const degPerSeg = 360 / totalSegments;
             
-            let start = null;
+            // RUMUS AKURASI:
+            // 1. Putar roda minimal 10 kali (10 * 360).
+            // 2. Berhenti pada posisi (360 - (targetIdx * degPerSeg)).
+            // 3. Kurangi setengah segmen agar panah menunjuk tepat di tengah teks.
+            const rotation = (10 * 360) + (360 - (targetIdx * degPerSeg)) - (degPerSeg / 2);
+            
             const duration = 5000;
-            
+            let start = null;
+
             spinBtn.disabled = true;
-            spinBtn.innerText = "MEMUTAR...";
+            spinBtn.innerText = "SEDANG BERPUTAR...";
 
             function animate(time) {
                 if (!start) start = time;
                 const elapsed = time - start;
                 const progress = Math.min(elapsed / duration, 1);
-                const easeOut = 1 - Math.pow(1 - progress, 4);
-                currentAngle = (easeOut * stopAngle) * (Math.PI / 180);
+                
+                // Efek perlambatan (Ease Out)
+                const easing = 1 - Math.pow(1 - progress, 4);
+                currentAngle = (easing * rotation) * (Math.PI / 180);
                 
                 draw();
 
@@ -150,7 +157,7 @@
             requestAnimationFrame(animate);
         }
 
-       function finalizeGame(idx) {
+        function finalizeGame(idx) {
             const hasil = segments[idx];
             localStorage.setItem("isDone", "true"); 
             localStorage.setItem("lastWin", hasil);
