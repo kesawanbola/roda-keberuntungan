@@ -3,16 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
-    <title>Lucky Spin Winner - Fixed</title>
+    <title>Lucky Spin Winner - Ultra Precision</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; text-align: center; background-color: #0f172a; color: white; margin: 0; padding: 20px; }
         .container { max-width: 400px; margin: auto; background: #1e293b; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         #wheel-wrapper { position: relative; width: 300px; height: 300px; margin: 25px auto; }
         canvas { width: 100% !important; height: 100% !important; border-radius: 50%; border: 5px solid #f1c40f; background: #fff; display: block; }
-        .pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 30px solid #f1c40f; z-index: 20; }
+        /* Panah disesuaikan agar benar-benar simetris */
+        .pointer { 
+            position: absolute; top: -15px; left: 50%; transform: translateX(-50%); 
+            width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; 
+            border-top: 30px solid #f1c40f; z-index: 20; 
+        }
         #spinBtn { padding: 18px; font-size: 18px; font-weight: bold; cursor: pointer; background-color: #ef4444; color: white; border: none; border-radius: 50px; box-shadow: 0 5px 0 #b91c1c; width: 100%; text-transform: uppercase; margin-top: 10px; }
         #spinBtn:disabled { background-color: #475569 !important; box-shadow: none !important; }
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); }
         .modal-content { background: white; color: #333; margin: 15% auto; padding: 25px; border-radius: 20px; width: 85%; max-width: 350px; text-align: center; }
         .btn-claim { display: inline-block; margin-top: 20px; padding: 15px 30px; background: #ef4444; color: white; text-decoration: none; font-weight: bold; border-radius: 50px; }
     </style>
@@ -43,17 +48,19 @@
         const ctx = canvas.getContext('2d');
         const spinBtn = document.getElementById('spinBtn');
         
-        // Urutan ini harus pas. Index 0 adalah "ZONK" yang dimulai tepat di posisi jam 12 (panah).
+        // SUSUNAN SEGMEN: ZONK di index 0 dimulai tepat di bawah panah
         const segments = ["ZONK", "500K", "ZONK", "100K", "10K", "50K"];
         const colors = ["#1e293b", "#f1c40f", "#1e293b", "#8b5cf6", "#1e293b", "#3b82f6"];
         let currentAngle = 0;
-        const segmentArc = (2 * Math.PI) / segments.length;
+        const totalSegments = segments.length;
+        const segmentArc = (2 * Math.PI) / totalSegments;
 
         function draw() {
             ctx.clearRect(0, 0, 500, 500);
-            for (let i = 0; i < segments.length; i++) {
-                // Rotasi awal dimulai dari -90 derajat (jam 12)
+            for (let i = 0; i < totalSegments; i++) {
+                // Gambar dimulai dari posisi -90 derajat (jam 12) agar index 0 berada di atas
                 const angle = currentAngle + (i * segmentArc) - (Math.PI / 2);
+                
                 ctx.beginPath();
                 ctx.fillStyle = colors[i];
                 ctx.moveTo(250, 250);
@@ -63,12 +70,13 @@
                 ctx.strokeStyle = "rgba(255,255,255,0.2)";
                 ctx.stroke();
 
+                // Gambar Teks Hadiah
                 ctx.save();
                 ctx.translate(250, 250);
                 ctx.rotate(angle + segmentArc / 2);
                 ctx.textAlign = "right";
                 ctx.fillStyle = "white";
-                ctx.font = "bold 35px Arial";
+                ctx.font = "bold 38px Arial";
                 ctx.fillText(segments[i], 220, 15);
                 ctx.restore();
             }
@@ -77,36 +85,45 @@
         window.onload = draw;
 
         function startSpin() {
-            if (localStorage.getItem("isDone") === "true") return;
+            if (localStorage.getItem("isSpinUsed") === "true") return;
 
             spinBtn.disabled = true;
             spinBtn.innerText = "SEDANG BERPUTAR...";
 
-            const targetIdx = Math.floor(Math.random() * segments.length);
+            // LOGIKA PENENTUAN HADIAH (0-5)
+            const targetIdx = Math.floor(Math.random() * totalSegments);
             
-            // Rumus perhitungan agar panah tepat menunjuk ke tengah segmen target
-            const extraRounds = 10; 
-            const segmentDeg = 360 / segments.length;
-            const targetRotation = (extraRounds * 360) + (360 - (targetIdx * segmentDeg));
+            // RUMUS PRESISI: 
+            // 1. Putar beberapa kali (8-10 kali).
+            // 2. Kurangi dengan jarak indeks agar segmen berhenti tepat di bawah panah.
+            const fullRounds = 8; 
+            const stopAngle = (fullRounds * 360) + (360 - (targetIdx * (360 / totalSegments)));
             
-            const targetAngle = targetRotation * (Math.PI / 180);
+            const targetAngleInRad = stopAngle * (Math.PI / 180);
             let startTime = null;
 
             function animate(now) {
                 if (!startTime) startTime = now;
                 const progress = Math.min((now - startTime) / 5000, 1);
+                
+                // Easing Quartic Out untuk pemberhentian yang halus
                 const easing = 1 - Math.pow(1 - progress, 4);
-                currentAngle = easing * targetAngle;
+                currentAngle = easing * targetAngleInRad;
+                
                 draw();
-                if (progress < 1) requestAnimationFrame(animate);
-                else finalize(targetIdx);
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    finalize(targetIdx);
+                }
             }
             requestAnimationFrame(animate);
         }
 
         function finalize(idx) {
             const hasil = segments[idx];
-            localStorage.setItem("isDone", "true");
+            localStorage.setItem("isSpinUsed", "true");
             
             setTimeout(() => {
                 const modal = document.getElementById('resultModal');
@@ -117,19 +134,12 @@
                     title.innerText = "🎁 HADIAH TERKUNCI!";
                     msg.innerHTML = `
                         <p>Selamat! ID Anda memenangkan saldo:</p>
-                        <h1 style="font-size: 40px; color: #22c55e; margin: 10px 0;">Rp ${hasil}</h1>
-                        <p style="font-size: 14px; background: #f3f4f6; padding: 15px; border-radius: 10px; text-align: left;">
-                            <b>Status ID:</b> <span style="color:red">BELUM AKTIF</span><br>
-                            <b>Cara Klaim:</b> Lakukan aktivasi deposit minimal 10rb untuk mencairkan hadiah ini.
+                        <h1 style="font-size: 45px; color: #22c55e; margin: 10px 0;">Rp ${hasil}</h1>
+                        <p style="font-size: 14px; background: #f3f4f6; padding: 15px; border-radius: 10px; text-align: left; color: #333;">
+                            <b>Status ID:</b> <span style="color:red; font-weight:bold;">BELUM AKTIF</span><br>
+                            <b>Cara Klaim:</b> Silakan lakukan aktivasi akun dengan deposit minimal 10rb. Hadiah akan cair otomatis ke saldo utama Anda.
                         </p>`;
                 } else {
                     title.innerText = "YAHH, COBA LAGI!";
-                    msg.innerHTML = "<p>Jangan menyerah! Hubungi admin Facebook untuk mendapatkan <b>Bonus Garansi 100%</b>.</p>";
+                    msg.innerHTML = "<p>Jangan menyerah! Hubungi admin Facebook kami untuk mendapatkan <b>Bonus Garansi Kekalahan 100%</b> khusus member baru!</p>";
                 }
-                modal.style.display = "block";
-                spinBtn.innerText = "SUDAH DIKLAIM";
-            }, 500);
-        }
-    </script>
-</body>
-</html>
