@@ -3,55 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lucky Spin - Roda Keberuntungan</title>
+    <title>Lucky Spin Premium - KesawanBola</title>
     <style>
         body {
             font-family: 'Segoe UI', sans-serif; text-align: center; 
-            background-color: #2c3e50; color: white; margin: 0; padding: 20px;
+            background-color: #1a1a2e; color: white; margin: 0; padding: 20px;
             user-select: none;
         }
-        .container { max-width: 450px; margin: auto; background: #34495e; padding: 20px; border-radius: 15px; }
-        #wheel-wrapper { position: relative; width: 350px; height: 350px; margin: 20px auto; }
-        canvas { width: 100%; height: 100%; border-radius: 50%; border: 8px solid #ecf0f1; background: #fff; }
+        .container { max-width: 450px; margin: auto; background: #16213e; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #2e3a59; }
+        
+        #wheel-wrapper { position: relative; width: 320px; height: 320px; margin: 25px auto; }
+        canvas { width: 100%; height: 100%; border-radius: 50%; border: 10px solid #f1c40f; background: #fff; box-shadow: 0 0 20px rgba(241, 196, 15, 0.4); }
         
         .pointer { 
-            position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
-            width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent;
-            border-top: 30px solid #f1c40f; z-index: 10;
+            position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+            width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent;
+            border-top: 40px solid #e94560; z-index: 10; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
         }
 
         button { 
-            padding: 15px 40px; font-size: 18px; font-weight: bold; cursor: pointer;
-            background-color: #27ae60; color: white; border: none; border-radius: 50px;
-            box-shadow: 0 4px 0 #1e8449; transition: 0.2s; width: 100%;
+            padding: 18px 40px; font-size: 18px; font-weight: bold; cursor: pointer;
+            background: linear-gradient(135deg, #e94560, #a22a3e); color: white; border: none; border-radius: 50px;
+            box-shadow: 0 5px 15px rgba(233, 69, 96, 0.4); transition: 0.3s; width: 100%; text-transform: uppercase;
         }
 
-        button:disabled { background-color: #95a5a6 !important; box-shadow: none !important; cursor: not-allowed; }
+        button:disabled { background: #444 !important; box-shadow: none !important; cursor: not-allowed; opacity: 0.7; }
 
-        #loginBtnContainer { margin-top: 15px; display: none; }
+        #loginBtnContainer { margin-top: 20px; display: none; }
         .btn-login-main {
             display: inline-block; padding: 15px 40px; font-size: 18px; font-weight: bold;
             background-color: #f1c40f; color: #000; text-decoration: none; border-radius: 50px;
-            box-shadow: 0 4px 0 #c29d0b; width: 80%;
+            box-shadow: 0 4px 0 #c29d0b; width: 85%; transition: 0.2s;
         }
 
         /* MODAL STYLE */
-        .modal { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); }
-        .modal-content { background: white; color: #333; margin: 20% auto; padding: 30px; border-radius: 15px; width: 80%; max-width: 380px; position: relative; }
-        .btn-link { display: inline-block; margin-top: 20px; padding: 12px 25px; background: #27ae60; color: white; text-decoration: none; font-weight: bold; border-radius: 50px; }
-        .status-badge { background: #e74c3c; color: white; padding: 2px 8px; border-radius: 5px; font-size: 12px; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); }
+        .modal-content { background: white; color: #333; margin: 15% auto; padding: 35px; border-radius: 20px; width: 85%; max-width: 380px; position: relative; text-align: center; }
+        .btn-link { display: inline-block; margin-top: 20px; padding: 15px 30px; background: #27ae60; color: white; text-decoration: none; font-weight: bold; border-radius: 50px; width: 80%; }
+        .status-badge { background: #e74c3c; color: white; padding: 3px 10px; border-radius: 5px; font-size: 13px; font-weight: bold; }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
     <div class="container">
-        <h2>🎡 Lucky Spin</h2>
+        <h2 style="color: #f1c40f; margin-bottom: 5px;">🎡 Lucky Spin Winner</h2>
+        <p style="font-size: 14px; opacity: 0.8;">Putar roda dan dapatkan saldo harianmu!</p>
+        
         <div id="wheel-wrapper">
             <div class="pointer"></div>
             <canvas id="wheelCanvas" width="500" height="500"></canvas>
         </div>
         
-        <button id="spinBtn" onclick="startSpin()">PUTAR SEKARANG</button>
+        <button id="spinBtn" onclick="startSpin()">KLAIM SPIN GRATIS</button>
         
         <div id="loginBtnContainer">
             <a href="https://shortio.link/login-kesawanbola" class="btn-login-main">LOGIN & KLAIM SEKARANG</a>
@@ -62,12 +65,15 @@
 
     <div id="resultModal" class="modal">
         <div class="modal-content">
-            <h2 id="modalTitle"></h2>
+            <h2 id="modalTitle">🎉 SELAMAT!</h2>
             <p id="modalMsg"></p>
-            <div id="activationNote" style="display:none; background:#f8f9fa; padding:10px; border-radius:8px; margin-top:10px; font-size:14px; color:#555; border-left: 4px solid #f1c40f;">
-                <strong>INFO:</strong> Silahkan lakukan deposit minimal 20rb untuk mengaktifkan <b>Bonus kemenangan Anda.</b>
+            <div style="background:#fdf2f2; padding:15px; border-radius:12px; margin-top:15px; font-size:14px; color:#444; border: 1px dashed #e74c3c; text-align: left;">
+                <strong>Cara Aktivasi Saldo:</strong><br>
+                1. Login ke akun KesawanBola.<br>
+                2. Deposit Min. <b>Rp 20.000</b>.<br>
+                3. Hadiah otomatis aktif di dompet utama!
             </div>
-            <a href="https://shortio.link/login-kesawanbola" class="btn-link">LOGIN & KLAIM</a>
+            <a href="https://shortio.link/login-kesawanbola" class="btn-link">AKTIVASI SEKARANG</a>
         </div>
     </div>
 
@@ -78,8 +84,9 @@
         const loginContainer = document.getElementById('loginBtnContainer');
         const resultModal = document.getElementById('resultModal');
         
-        const segments = ["ZONK", "50K", "ZONK", "100K", "ZONK", "500K"];
-        const colors = ["#1e293b", "#3498db", "#1e293b", "#9b59b6", "#1e293b", "#f1c40f"];
+        // Perbaikan Hadiah: Tidak ada ZONK agar user mau deposit
+        const segments = ["10K", "50K", "20K", "100K", "25K", "500K"];
+        const colors = ["#1a1a2e", "#3498db", "#16213e", "#9b59b6", "#1a1a2e", "#f1c40f"];
         
         let currentAngle = 0;
         const totalSegments = segments.length;
@@ -95,8 +102,8 @@
                 ctx.arc(250, 250, 245, angle, angle + segmentArc);
                 ctx.lineTo(250, 250);
                 ctx.fill();
-                ctx.strokeStyle = "rgba(255,255,255,0.3)";
-                ctx.lineWidth = 2;
+                ctx.strokeStyle = "#f1c40f";
+                ctx.lineWidth = 3;
                 ctx.stroke();
 
                 ctx.save();
@@ -104,8 +111,8 @@
                 ctx.rotate(angle + segmentArc / 2);
                 ctx.textAlign = "right";
                 ctx.fillStyle = "white";
-                ctx.font = "bold 35px Arial";
-                ctx.fillText(segments[i], 230, 15);
+                ctx.font = "bold 38px Arial";
+                ctx.fillText(segments[i], 220, 15);
                 ctx.restore();
             }
         }
@@ -113,21 +120,24 @@
         function startSpin() {
             if (localStorage.getItem("isDone") === "true") return;
 
-            const targetIdx = Math.floor(Math.random() * totalSegments);
+            // PENGATURAN KEMENANGAN:
+            // Pilih indeks: 0(10K), 1(50K), 2(20K), 3(100K), 4(25K), 5(500K)
+            const menangHadiahBesar = [1, 3, 5]; // 50k, 100k, 500k
+            const targetIdx = menangHadiahBesar[Math.floor(Math.random() * menangHadiahBesar.length)];
+
             const degPerSeg = 360 / totalSegments;
-            // Perhitungan agar panah tepat di tengah segmen
-            const rotation = (10 * 360) + (360 - (targetIdx * degPerSeg)) - (degPerSeg / 2);
+            const rotation = (12 * 360) + (360 - (targetIdx * degPerSeg)) - (degPerSeg / 2);
             
             let start = null;
             const duration = 5000;
             spinBtn.disabled = true;
-            spinBtn.innerText = "SEDANG BERPUTAR...";
+            spinBtn.innerText = "MEMPROSES HADIAH...";
 
             function animate(time) {
                 if (!start) start = time;
                 const elapsed = time - start;
                 const progress = Math.min(elapsed / duration, 1);
-                const easing = 1 - Math.pow(1 - progress, 4);
+                const easing = 1 - Math.pow(1 - progress, 4); // Kuat di awal, halus di akhir
                 currentAngle = (easing * rotation) * (Math.PI / 180);
                 draw();
                 if (progress < 1) {
@@ -144,28 +154,13 @@
             localStorage.setItem("isDone", "true");
             localStorage.setItem("lastWin", hasil);
             
-            spinBtn.innerText = "KESEMPATAN HABIS";
+            spinBtn.innerText = "KLAIM BERHASIL";
             loginContainer.style.display = "block";
 
-            const title = document.getElementById('modalTitle');
             const msg = document.getElementById('modalMsg');
-            const note = document.getElementById('activationNote');
-
-            if (hasil !== "ZONK") {
-                title.innerText = "🎉 ANDA MENANG!";
-                title.style.color = "#27ae60";
-                msg.innerHTML = `Selamat! Anda berhak mendapatkan bonus kemenangan sebesar <b>Rp ${hasil}</b>.`;
-                note.style.display = "block";
-                document.getElementById('resultText').innerHTML = `HASIL: Rp ${hasil} <br><small>(Status: <span class="status-badge">Menunggu Deposit minimal 20Rb</span>)</small>`;
-            } else {
-                title.innerText = "💔 ZONK";
-                title.style.color = "#e74c3c";
-                msg.innerText = "Maaf, Anda kurang beruntung. Coba lagi di kesempatan berikutnya!";
-                note.style.display = "none";
-                document.getElementById('resultText').innerText = "COBA LAGI BESOK!";
-            }
-
-            // Memastikan modal muncul
+            msg.innerHTML = `Selamat! Bosku memenangkan saldo <b>Rp ${hasil}</b>. <br><br>Status Hadiah: <span class="status-badge">BELUM AKTIF</span>`;
+            
+            document.getElementById('resultText').innerHTML = `HADIAH: Rp ${hasil} <br><small>(Status: <span class="status-badge">Menunggu Deposit</span>)</small>`;
             resultModal.style.display = "block";
         }
 
@@ -173,14 +168,9 @@
             if (localStorage.getItem("isDone") === "true") {
                 const lastWin = localStorage.getItem("lastWin");
                 spinBtn.disabled = true;
-                spinBtn.innerText = "KESEMPATAN HABIS";
+                spinBtn.innerText = "SUDAH DIKLAIM";
                 loginContainer.style.display = "block";
-                
-                if(lastWin && lastWin !== "ZONK") {
-                   document.getElementById('resultText').innerHTML = `HASIL: Rp ${lastWin} <br><small>(Status: <span class="status-badge">Menunggu Deposit</span>)</small>`;
-                } else {
-                   document.getElementById('resultText').innerText = "COBA LAGI BESOK!";
-                }
+                document.getElementById('resultText').innerHTML = `HADIAH: Rp ${lastWin} <br><small>(Status: <span class="status-badge">Menunggu Deposit</span>)</small>`;
             }
             draw();
         };
