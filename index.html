@@ -2,44 +2,74 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
-    <title>Lucky Spin Winner - Ultra Precision</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucky Spin</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; text-align: center; background-color: #0f172a; color: white; margin: 0; padding: 20px; }
-        .container { max-width: 400px; margin: auto; background: #1e293b; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        #wheel-wrapper { position: relative; width: 300px; height: 300px; margin: 25px auto; }
-        canvas { width: 100% !important; height: 100% !important; border-radius: 50%; border: 5px solid #f1c40f; background: #fff; display: block; }
-        /* Panah disesuaikan agar benar-benar simetris */
-        .pointer { 
-            position: absolute; top: -15px; left: 50%; transform: translateX(-50%); 
-            width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; 
-            border-top: 30px solid #f1c40f; z-index: 20; 
+        body {
+            font-family: 'Segoe UI', sans-serif; text-align: center; 
+            background-color: #2c3e50; color: white; margin: 0; padding: 20px;
+            user-select: none;
         }
-        #spinBtn { padding: 18px; font-size: 18px; font-weight: bold; cursor: pointer; background-color: #ef4444; color: white; border: none; border-radius: 50px; box-shadow: 0 5px 0 #b91c1c; width: 100%; text-transform: uppercase; margin-top: 10px; }
-        #spinBtn:disabled { background-color: #475569 !important; box-shadow: none !important; }
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); }
-        .modal-content { background: white; color: #333; margin: 15% auto; padding: 25px; border-radius: 20px; width: 85%; max-width: 350px; text-align: center; }
-        .btn-claim { display: inline-block; margin-top: 20px; padding: 15px 30px; background: #ef4444; color: white; text-decoration: none; font-weight: bold; border-radius: 50px; }
+        .container { max-width: 450px; margin: auto; background: #34495e; padding: 20px; border-radius: 15px; }
+        #wheel-wrapper { position: relative; width: 350px; height: 350px; margin: 20px auto; }
+        canvas { width: 100%; height: 100%; border-radius: 50%; border: 8px solid #ecf0f1; background: #fff; }
+        
+        .pointer { 
+            position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+            width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent;
+            border-top: 30px solid #f1c40f; z-index: 10;
+        }
+
+        button { 
+            padding: 15px 40px; font-size: 18px; font-weight: bold; cursor: pointer;
+            background-color: #27ae60; color: white; border: none; border-radius: 50px;
+            box-shadow: 0 4px 0 #1e8449; transition: 0.2s;
+        }
+
+        button:disabled { 
+            background-color: #95a5a6 !important; 
+            box-shadow: none !important;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Style untuk tombol login tambahan di bawah */
+        #loginBtnContainer { margin-top: 15px; display: none; }
+        .btn-login-main {
+            display: inline-block; padding: 15px 40px; font-size: 18px; font-weight: bold;
+            background-color: #f1c40f; color: #000; text-decoration: none; border-radius: 50px;
+            box-shadow: 0 4px 0 #c29d0b; transition: 0.2s;
+        }
+        .btn-login-main:active { transform: translateY(2px); box-shadow: 0 2px 0 #c29d0b; }
+
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); }
+        .modal-content { background: white; color: #333; margin: 15% auto; padding: 30px; border-radius: 15px; width: 80%; max-width: 380px; }
+        .btn-link { display: inline-block; margin-top: 20px; padding: 12px 25px; background: #f1c40f; color: black; text-decoration: none; font-weight: bold; border-radius: 5px; }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
 
     <div class="container">
-        <h2 style="color: #f1c40f; margin-bottom: 5px;">🎡 Lucky Spin Winner</h2>
-        <p style="font-size: 14px; opacity: 0.8;">Putar roda dan dapatkan saldo harianmu!</p>
+        <h2>🎡 Lucky Spin</h2>
         <div id="wheel-wrapper">
             <div class="pointer"></div>
             <canvas id="wheelCanvas" width="500" height="500"></canvas>
         </div>
-        <button id="spinBtn" onclick="startSpin()">KLAIM SPIN GRATIS</button>
+        
+        <button id="spinBtn" onclick="startSpin()">PUTAR SEKARANG</button>
+        
+        <div id="loginBtnContainer">
+            <a href="https://shortio.link/login-kesawanbola" class="btn-login-main">LOGIN & KLAIM SEKARANG</a>
+        </div>
+
+        <h3 id="resultText" style="color:#f1c40f; margin-top:20px;"></h3>
     </div>
 
     <div id="resultModal" class="modal">
         <div class="modal-content">
-            <h2 id="modalTitle" style="color: #e67e22;">🎁 HADIAH TERKUNCI!</h2>
-            <div id="modalMsg"></div>
-            <p style="font-weight: bold; color: #ef4444; margin-top: 10px;">Segera Aktivasi Sebelum Hangus!</p>
-            <a href="https://shortio.link/login-kesawanbola" class="btn-claim">AKTIVASI & KLAIM SEKARANG</a>
+            <h2 id="modalTitle"></h2>
+            <p id="modalMsg"></p>
+            <a href="https://shortio.link/login-kesawanbola" class="btn-link">LOGIN & KLAIM SEKARANG</a>
         </div>
     </div>
 
@@ -47,99 +77,112 @@
         const canvas = document.getElementById('wheelCanvas');
         const ctx = canvas.getContext('2d');
         const spinBtn = document.getElementById('spinBtn');
+        const loginContainer = document.getElementById('loginBtnContainer');
         
-        // SUSUNAN SEGMEN: ZONK di index 0 dimulai tepat di bawah panah
-        const segments = ["ZONK", "500K", "ZONK", "100K", "10K", "50K"];
-        const colors = ["#1e293b", "#f1c40f", "#1e293b", "#8b5cf6", "#1e293b", "#3b82f6"];
+        const segments = ["ZONK", "50K", "ZONK", "100K", "ZONK", "500K"];
+        const colors = ["#e74c3c", "#3498db", "#e74c3c", "#9b59b6", "#e74c3c", "#f1c40f"];
+        
         let currentAngle = 0;
-        const totalSegments = segments.length;
-        const segmentArc = (2 * Math.PI) / totalSegments;
+        const segmentArc = (2 * Math.PI) / segments.length;
+
+        function checkStatus() {
+            if (localStorage.getItem("isDone") === "true") {
+                spinBtn.disabled = true;
+                spinBtn.innerText = "HANYA BISA 1X SPIN";
+                // Tampilkan tombol login di bawah roda
+                loginContainer.style.display = "block";
+            }
+        }
 
         function draw() {
             ctx.clearRect(0, 0, 500, 500);
-            for (let i = 0; i < totalSegments; i++) {
-                // Gambar dimulai dari posisi -90 derajat (jam 12) agar index 0 berada di atas
-                const angle = currentAngle + (i * segmentArc) - (Math.PI / 2);
-                
+            for (let i = 0; i < segments.length; i++) {
+                const angle = currentAngle + (i * segmentArc);
                 ctx.beginPath();
                 ctx.fillStyle = colors[i];
                 ctx.moveTo(250, 250);
-                ctx.arc(250, 250, 240, angle, angle + segmentArc);
+                ctx.arc(250, 250, 245, angle, angle + segmentArc);
                 ctx.lineTo(250, 250);
                 ctx.fill();
-                ctx.strokeStyle = "rgba(255,255,255,0.2)";
+                ctx.strokeStyle = "white";
+                ctx.lineWidth = 3;
                 ctx.stroke();
 
-                // Gambar Teks Hadiah
                 ctx.save();
                 ctx.translate(250, 250);
                 ctx.rotate(angle + segmentArc / 2);
                 ctx.textAlign = "right";
                 ctx.fillStyle = "white";
-                ctx.font = "bold 38px Arial";
-                ctx.fillText(segments[i], 220, 15);
+                ctx.font = "bold 30px Arial";
+                ctx.fillText(segments[i], 220, 10);
                 ctx.restore();
             }
         }
 
-        window.onload = draw;
-
         function startSpin() {
-            if (localStorage.getItem("isSpinUsed") === "true") return;
+            if (localStorage.getItem("isDone") === "true") return;
 
+            const targetIdx = Math.floor(Math.random() * segments.length);
+            const degreesPerSegment = 360 / segments.length;
+            const stopAngle = (12 * 360) + (360 - (targetIdx * degreesPerSegment)) - 90 - (degreesPerSegment / 2);
+            
+            let start = null;
+            const duration = 5000;
+            
             spinBtn.disabled = true;
-            spinBtn.innerText = "SEDANG BERPUTAR...";
+            spinBtn.innerText = "MEMUTAR...";
 
-            // LOGIKA PENENTUAN HADIAH (0-5)
-            const targetIdx = Math.floor(Math.random() * totalSegments);
-            
-            // RUMUS PRESISI: 
-            // 1. Putar beberapa kali (8-10 kali).
-            // 2. Kurangi dengan jarak indeks agar segmen berhenti tepat di bawah panah.
-            const fullRounds = 8; 
-            const stopAngle = (fullRounds * 360) + (360 - (targetIdx * (360 / totalSegments)));
-            
-            const targetAngleInRad = stopAngle * (Math.PI / 180);
-            let startTime = null;
-
-            function animate(now) {
-                if (!startTime) startTime = now;
-                const progress = Math.min((now - startTime) / 5000, 1);
-                
-                // Easing Quartic Out untuk pemberhentian yang halus
-                const easing = 1 - Math.pow(1 - progress, 4);
-                currentAngle = easing * targetAngleInRad;
+            function animate(time) {
+                if (!start) start = time;
+                const elapsed = time - start;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeOut = 1 - Math.pow(1 - progress, 4);
+                currentAngle = (easeOut * stopAngle) * (Math.PI / 180);
                 
                 draw();
-                
+
                 if (progress < 1) {
                     requestAnimationFrame(animate);
                 } else {
-                    finalize(targetIdx);
+                    finalizeGame(targetIdx);
                 }
             }
             requestAnimationFrame(animate);
         }
 
-        function finalize(idx) {
+        function finalizeGame(idx) {
             const hasil = segments[idx];
-            localStorage.setItem("isSpinUsed", "true");
+            document.getElementById('resultText').innerText = "HASIL: " + hasil;
             
+            localStorage.setItem("isDone", "true"); 
+            spinBtn.innerText = "HANYA BISA 1X SPIN";
+            
+            // Tampilkan tombol login setelah spin selesai
+            loginContainer.style.display = "block";
+
             setTimeout(() => {
                 const modal = document.getElementById('resultModal');
-                const msg = document.getElementById('modalMsg');
                 const title = document.getElementById('modalTitle');
+                const msg = document.getElementById('modalMsg');
 
-                if (hasil !== "ZONK") {
-                    title.innerText = "🎁 HADIAH TERKUNCI!";
-                    msg.innerHTML = `
-                        <p>Selamat! ID Anda memenangkan saldo:</p>
-                        <h1 style="font-size: 45px; color: #22c55e; margin: 10px 0;">Rp ${hasil}</h1>
-                        <p style="font-size: 14px; background: #f3f4f6; padding: 15px; border-radius: 10px; text-align: left; color: #333;">
-                            <b>Status ID:</b> <span style="color:red; font-weight:bold;">BELUM AKTIF</span><br>
-                            <b>Cara Klaim:</b> Silakan lakukan aktivasi akun dengan deposit minimal 10rb. Hadiah akan cair otomatis ke saldo utama Anda.
-                        </p>`;
+                if ([1, 3, 5].includes(idx)) {
+                    title.innerText = "🎉 SELAMAT!";
+                    title.style.color = "green";
+                    msg.innerHTML = `Bosku Berhasil Mendapatkan <b>BONUS KEMENANGAN ${hasil}</b> pada <b>Mahjong Ways 2</b>! Silahkan login dan mainkan gamenya.`;
                 } else {
-                    title.innerText = "YAHH, COBA LAGI!";
-                    msg.innerHTML = "<p>Jangan menyerah! Hubungi admin Facebook kami untuk mendapatkan <b>Bonus Garansi Kekalahan 100%</b> khusus member baru!</p>";
+                    title.innerText = "💔 YAHH...";
+                    title.style.color = "red";
+                    msg.innerText = "YAH KURANG BERUNTUNG, BOSKU BISA LOGIN DAN KLAIM LUCKY SPIN LAINNYA YA";
                 }
+                modal.style.display = "block";
+            }, 500);
+        }
+
+        checkStatus();
+        draw();
+
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.onkeydown = e => { if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && [73, 74, 67].includes(e.keyCode)) || (e.ctrlKey && e.keyCode == 85)) return false; };
+    </script>
+</body>
+</html>
