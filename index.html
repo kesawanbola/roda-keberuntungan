@@ -2,8 +2,8 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lucky Spin Fix</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
+    <title>Lucky Spin Winner</title>
     <style>
         body {
             font-family: 'Segoe UI', sans-serif; text-align: center; 
@@ -13,39 +13,46 @@
             max-width: 400px; margin: auto; background: #1e293b; 
             padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
         }
+        
         #wheel-wrapper { position: relative; width: 300px; height: 300px; margin: 25px auto; }
         
-        /* Memastikan Canvas terlihat */
         canvas { 
-            display: block; width: 100%; height: 100%; 
-            border-radius: 50%; border: 6px solid #f1c40f;
-            background-color: #fff;
+            width: 100% !important; height: 100% !important;
+            border-radius: 50%; border: 5px solid #f1c40f; 
+            background: #fff; display: block;
         }
         
         .pointer { 
             position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
             width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent;
-            border-top: 30px solid #f1c40f; z-index: 10;
+            border-top: 30px solid #f1c40f; z-index: 20;
         }
 
         #spinBtn { 
-            padding: 15px; font-size: 18px; font-weight: bold; cursor: pointer;
+            padding: 18px; font-size: 18px; font-weight: bold; cursor: pointer;
             background-color: #ef4444; color: white; border: none; border-radius: 50px;
-            box-shadow: 0 5px 0 #b91c1c; width: 100%; text-transform: uppercase;
+            box-shadow: 0 5px 0 #b91c1c; transition: 0.1s; width: 100%;
+            text-transform: uppercase; margin-top: 10px;
         }
         #spinBtn:disabled { background-color: #475569 !important; box-shadow: none !important; }
 
-        /* Modal */
-        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); }
-        .modal-content { background: white; color: #333; margin: 20% auto; padding: 25px; border-radius: 20px; width: 80%; max-width: 320px; }
-        .btn-claim { display: inline-block; margin-top: 15px; padding: 12px 25px; background: #ef4444; color: white; text-decoration: none; font-weight: bold; border-radius: 50px; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); }
+        .modal-content { 
+            background: white; color: #333; margin: 15% auto; padding: 25px; 
+            border-radius: 20px; width: 85%; max-width: 350px; text-align: center; 
+        }
+        .btn-claim { 
+            display: inline-block; margin-top: 20px; padding: 15px 30px; 
+            background: #ef4444; color: white; text-decoration: none; 
+            font-weight: bold; border-radius: 50px; font-size: 16px; 
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2 style="color: #f1c40f;">🎡 Lucky Spin Winner</h2>
-        <p style="font-size: 14px;">Putar roda dan amankan hadiah harianmu!</p>
+        <h2 style="color: #f1c40f; margin-bottom: 5px;">🎡 Lucky Spin Winner</h2>
+        <p style="font-size: 14px; opacity: 0.8;">Putar roda dan amankan hadiah saldo harianmu!</p>
         
         <div id="wheel-wrapper">
             <div class="pointer"></div>
@@ -57,9 +64,10 @@
 
     <div id="resultModal" class="modal">
         <div class="modal-content">
-            <h2 id="modalTitle" style="color: #e67e22; margin: 0;">🎁 TERKUNCI!</h2>
+            <h2 id="modalTitle" style="color: #e67e22;">🎁 HADIAH TERKUNCI!</h2>
             <div id="modalMsg"></div>
-            <a href="https://shortio.link/login-kesawanbola" class="btn-claim">AKTIVASI SEKARANG</a>
+            <p style="font-weight: bold; color: #ef4444; margin-top: 10px;">Segera Aktivasi Sebelum Hangus!</p>
+            <a href="https://shortio.link/login-kesawanbola" class="btn-claim">AKTIVASI & KLAIM SEKARANG</a>
         </div>
     </div>
 
@@ -71,22 +79,90 @@
         const segments = ["ZONK", "50K", "10K", "100K", "ZONK", "500K"];
         const colors = ["#1e293b", "#3b82f6", "#1e293b", "#8b5cf6", "#1e293b", "#f1c40f"];
         let currentAngle = 0;
+        const segmentArc = (2 * Math.PI) / segments.length;
 
-        // FUNGSI UTAMA MENGGAMBAR (DIPERBAIKI)
-        function drawWheel() {
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
-            const radius = centerX - 10;
-            const segmentArc = (2 * Math.PI) / segments.length;
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+        function draw() {
+            ctx.clearRect(0, 0, 500, 500);
             for (let i = 0; i < segments.length; i++) {
                 const angle = currentAngle + (i * segmentArc);
-                
-                // Gambar potongan pie
                 ctx.beginPath();
                 ctx.fillStyle = colors[i];
-                ctx.moveTo(centerX, centerY);
-                ctx.arc(centerX, centerY, radius, angle, angle + segmentArc);
-                ctx.lineTo(centerX
+                ctx.moveTo(250, 250);
+                ctx.arc(250, 250, 240, angle, angle + segmentArc);
+                ctx.lineTo(250, 250);
+                ctx.fill();
+                ctx.strokeStyle = "rgba(255,255,255,0.2)";
+                ctx.stroke();
+
+                ctx.save();
+                ctx.translate(250, 250);
+                ctx.rotate(angle + segmentArc / 2);
+                ctx.textAlign = "right";
+                ctx.fillStyle = "white";
+                ctx.font = "bold 35px Arial";
+                ctx.fillText(segments[i], 220, 15);
+                ctx.restore();
+            }
+        }
+
+        // PASTIKAN RODA DIGAMBAR SAAT HALAMAN DIBUKA
+        window.onload = function() {
+            draw();
+            if (localStorage.getItem("isDone") === "true") {
+                spinBtn.disabled = true;
+                spinBtn.innerText = "SUDAH DIKLAIM";
+            }
+        };
+
+        function startSpin() {
+            if (localStorage.getItem("isDone") === "true") return;
+
+            spinBtn.disabled = true;
+            spinBtn.innerText = "SEDANG BERPUTAR...";
+
+            const targetIdx = Math.floor(Math.random() * segments.length);
+            const totalRotation = (360 * 10) + (360 - (targetIdx * (360 / segments.length))) - 90;
+            const targetAngle = totalRotation * (Math.PI / 180);
+
+            let startTime = null;
+            const duration = 5000;
+
+            function animate(currentTime) {
+                if (!startTime) startTime = currentTime;
+                const progress = Math.min((currentTime - startTime) / duration, 1);
+                const easing = 1 - Math.pow(1 - progress, 4);
+                currentAngle = easing * targetAngle;
+                draw();
+                if (progress < 1) requestAnimationFrame(animate);
+                else finalize(targetIdx);
+            }
+            requestAnimationFrame(animate);
+        }
+
+        function finalize(idx) {
+            const hasil = segments[idx];
+            localStorage.setItem("isDone", "true");
+            
+            setTimeout(() => {
+                const modal = document.getElementById('resultModal');
+                const msg = document.getElementById('modalMsg');
+
+                if (hasil !== "ZONK") {
+                    msg.innerHTML = `
+                        <p>Selamat! ID Anda memenangkan saldo:</p>
+                        <h1 style="font-size: 40px; color: #22c55e; margin: 10px 0;">Rp ${hasil}</h1>
+                        <p style="font-size: 14px; background: #f3f4f6; padding: 15px; border-radius: 10px; text-align: left;">
+                            <b>Status ID:</b> <span style="color:red">BELUM AKTIF</span><br>
+                            <b>Cara Klaim:</b> Deposit minimal 10rb untuk aktivasi saldo hadiah otomatis masuk ke akun Anda.
+                        </p>`;
+                } else {
+                    document.getElementById('modalTitle').innerText = "YAHH, COBA LAGI!";
+                    msg.innerHTML = "<p>Jangan menyerah! Hubungi admin Facebook untuk mendapatkan <b>Bonus Garansi 100%</b> khusus member baru!</p>";
+                }
+                modal.style.display = "block";
+                spinBtn.innerText = "SUDAH DIKLAIM";
+            }, 500);
+        }
+    </script>
+</body>
+</html>
