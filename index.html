@@ -160,23 +160,40 @@
             // Tampilkan tombol login setelah spin selesai
             loginContainer.style.display = "block";
 
-            setTimeout(() => {
-                const modal = document.getElementById('resultModal');
-                const title = document.getElementById('modalTitle');
-                const msg = document.getElementById('modalMsg');
+      setTimeout(() => {
+    const modal = document.getElementById('resultModal');
+    const title = document.getElementById('modalTitle');
+    const msg = document.getElementById('modalMsg');
 
-                if ([1, 3, 5].includes(idx)) {
-                    title.innerText = "🎉 SELAMAT!";
-                    title.style.color = "green";
-                    msg.innerHTML = `Bosku Berhasil Mendapatkan <b>BONUS KEMENANGAN ${hasil}</b> pada <b>Mahjong Ways 2</b>! Silahkan login dan mainkan gamenya.`;
-                } else {
-                    title.innerText = "💔 YAHH...";
-                    title.style.color = "red";
-                    msg.innerText = "YAH KURANG BERUNTUNG, BOSKU BISA LOGIN DAN KLAIM LUCKY SPIN LAINNYA YA";
-                }
-                modal.style.display = "block";
-            }, 500);
-        }
+    if ([1, 3, 5].includes(idx)) {
+        // Tampilan Jika Menang (Memicu Deposit)
+        title.innerText = "🎁 HADIAH TERKUNCI!";
+        title.style.color = "#f1c40f"; // Warna Emas
+        msg.innerHTML = `
+            <div style="background: #fdf2ce; padding: 15px; border-radius: 10px; border: 1px solid #f1c40f; color: #333;">
+                <p style="margin: 0; font-size: 16px;">Selamat! ID Anda terpilih mendapatkan:</p>
+                <h2 style="margin: 10px 0; color: #e94560;">SALDO AKTIVASI ${hasil}</h2>
+                <hr style="border: 0.5px solid #ccc;">
+                <p style="text-align: left; font-size: 13px;">
+                    <b>Status:</b> <span style="color: red;">BELUM AKTIF</span><br>
+                    <b>Cara Klaim:</b> Silahkan <b>Login</b> dan lakukan <b>Deposit Minimal 10rb</b> untuk membuka kunci saldo hadiah ini.<br><br>
+                    <i>*Hadiah otomatis hangus jika ID tidak diaktivasi dalam 30 menit.</i>
+                </p>
+            </div>
+        `;
+    } else {
+        // Tampilan Jika Zonk (Tetap pancing untuk login/deposit)
+        title.innerText = "💔 KESEMPATAN KEDUA!";
+        title.style.color = "#555";
+        msg.innerHTML = `
+            <p>Kotak ini kosong, tapi jangan berkecil hati!</p>
+            <p style="font-size: 14px; color: #333;">
+                Dapatkan <b>Bonus Garansi Kekalahan 100%</b> khusus deposit pertama Anda hari ini. Login sekarang untuk melihat promo lainnya!
+            </p>
+        `;
+    }
+    modal.style.display = "block";
+}, 500);
 
         checkStatus();
         draw();
