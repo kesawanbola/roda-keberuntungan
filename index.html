@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lucky Spin - Roda Keberuntungan</title>
+    <title>Lucky Spin - Fixed Modal</title>
     <style>
         body {
             font-family: 'Segoe UI', sans-serif; text-align: center; 
@@ -65,7 +65,7 @@
             <h2 id="modalTitle"></h2>
             <p id="modalMsg"></p>
             <div id="activationNote" style="display:none; background:#f8f9fa; padding:10px; border-radius:8px; margin-top:10px; font-size:14px; color:#555; border-left: 4px solid #f1c40f;">
-                <strong>INFO:</strong> Silahkan lakukan deposit minimal 25rb untuk mengaktifkan <b>Bonus Kemenangan Anda.</b>
+                <strong>INFO:</strong> Silahkan lakukan deposit minimal 10rb untuk mengaktifkan saldo kemenangan Anda.
             </div>
             <a href="https://shortio.link/login-kesawanbola" class="btn-link">LOGIN & KLAIM</a>
         </div>
@@ -154,7 +154,7 @@
             if (hasil !== "ZONK") {
                 title.innerText = "🎉 ANDA MENANG!";
                 title.style.color = "#27ae60";
-                msg.innerHTML = `Selamat! Anda berhak mendapatkan Bonus sebesar <b>Rp ${hasil}</b>.`;
+                msg.innerHTML = `Selamat! Anda berhak mendapatkan saldo sebesar <b>Rp ${hasil}</b>.`;
                 note.style.display = "block";
                 document.getElementById('resultText').innerHTML = `HASIL: Rp ${hasil} <br><small>(Status: <span class="status-badge">Menunggu Deposit</span>)</small>`;
             } else {
@@ -162,7 +162,7 @@
                 title.style.color = "#e74c3c";
                 msg.innerText = "Maaf, Anda kurang beruntung. Coba lagi di kesempatan berikutnya!";
                 note.style.display = "none";
-                document.getElementById('resultText').innerText = "BOSKU BISA CLAIM BONUS LAINNYA YA!";
+                document.getElementById('resultText').innerText = "COBA LAGI BESOK!";
             }
 
             // Memastikan modal muncul
@@ -179,7 +179,7 @@
                 if(lastWin && lastWin !== "ZONK") {
                    document.getElementById('resultText').innerHTML = `HASIL: Rp ${lastWin} <br><small>(Status: <span class="status-badge">Menunggu Deposit</span>)</small>`;
                 } else {
-                   document.getElementById('resultText').innerText = "BOSKU BISA CLAIM BONUS LAINNYA YA!";
+                   document.getElementById('resultText').innerText = "COBA LAGI BESOK!";
                 }
             }
             draw();
@@ -188,3 +188,6 @@
         // Anti-Inspect & Klik Kanan
         document.addEventListener('contextmenu', e => e.preventDefault());
         document.onkeydown = e => { if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && [73, 74, 67].includes(e.keyCode)) || (e.ctrlKey && e.keyCode == 85)) return false; };
+    </script>
+</body>
+</html>
