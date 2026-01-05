@@ -149,20 +149,34 @@
             requestAnimationFrame(animate);
         }
 
-        function showResult(idx) {
-            const hasil = segments[idx];
-            localStorage.setItem("isDone", "true");
-            localStorage.setItem("lastWin", hasil);
-            
-            spinBtn.innerText = "KLAIM BERHASIL";
-            loginContainer.style.display = "block";
+       /* Cari fungsi showResult(idx) di kodingan sebelumnya dan ganti bagian ini */
+function showResult(idx) {
+    const hasil = segments[idx];
+    localStorage.setItem("isDone", "true");
+    localStorage.setItem("lastWin", hasil);
+    
+    spinBtn.innerText = "KLAIM BERHASIL";
+    loginContainer.style.display = "block";
 
-            const msg = document.getElementById('modalMsg');
-            msg.innerHTML = `Selamat! Bosku memenangkan <b>Bonus Kemenangan Rp ${hasil}</b>. <br><br>Status Hadiah: <span class="status-badge">BELUM AKTIF</span>`;
-            
-            document.getElementById('resultText').innerHTML = `HADIAH: Rp ${hasil} <br><small>(Status: <span class="status-badge">Menunggu Deposit</span>)</small>`;
-            resultModal.style.display = "block";
-        }
+    const msg = document.getElementById('modalMsg');
+    // Penambahan instruksi screenshot
+    msg.innerHTML = `
+        <div style="border: 2px dashed #27ae60; padding: 10px; margin-bottom: 15px;">
+            <span style="font-size: 12px; color: #27ae60; font-weight: bold;">WAJIB:</span><br>
+            <span style="font-size: 16px;">Silahkan <b>SCREENSHOT</b> layar ini dan kirim ke CS untuk aktivasi hadiah!</span>
+        </div>
+        Selamat! Bosku memenangkan saldo <b>Rp ${hasil}</b>. <br><br>
+        Status Hadiah: <span class="status-badge">BELUM AKTIF</span>`;
+    
+    document.getElementById('resultText').innerHTML = `
+        <div style="background: #f1c40f; color: black; padding: 5px; border-radius: 5px;">
+            <b>SEGERA SCREENSHOT HADIAH ANDA!</b>
+        </div>
+        HADIAH: Rp ${hasil} <br>
+        <small>(Status: <span class="status-badge">Menunggu Deposit & Aktivasi CS</span>)</small>`;
+    
+    resultModal.style.display = "block";
+}
 
         window.onload = () => {
             if (localStorage.getItem("isDone") === "true") {
