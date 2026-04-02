@@ -78,6 +78,18 @@
     </div>
 
     <script>
+
+        // Contoh fungsi kirim data ke database
+function simpanKeDatabase(userID, hadiah) {
+    fetch('simpan_hadiah.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `user_id=${userID}&hadiah=${hadiah}`
+    })
+    .then(response => response.text())
+    .then(data => console.log("Data tersimpan"));
+}
+        
         const canvas = document.getElementById('wheelCanvas');
         const ctx = canvas.getContext('2d');
         const spinBtn = document.getElementById('spinBtn');
